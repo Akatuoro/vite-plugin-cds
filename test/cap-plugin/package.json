@@ -1,0 +1,11 @@
+{
+    "name": "cap-plugin-test",
+    "type": "module",
+    "scripts": {
+        "start": "vite"
+    },
+    "devDependencies": {
+        "@sap/cds": "^9",
+        "vite": "^7"
+    }
+}
