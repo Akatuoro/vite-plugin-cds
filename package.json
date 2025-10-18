@@ -16,5 +16,8 @@
         "@sap/cds": "^9",
         "vite": "^7"
     },
+    "workspaces": [
+        "test/cap-app"
+    ],
     "author": "johannes@vogt.codes"
 }
