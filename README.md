@@ -10,15 +10,13 @@ A [vite](https://vitejs.dev/) plugin for the [SAP Cloud Application Programming 
 
 ### Run vite apps via `cds watch`
 
-Install vite and the plugin as a development dependency in the root of your CAP project.
+Install vite and the plugin as development dependencies in the root of your CAP project.
 
 ```sh
 npm install --save-dev vite vite-plugin-cds
 ```
 
-Add a `vite.config.js` file to any frontend applications in the `app/` folder of your CAP project.
-
-As example:
+Add a `vite.config.js` to any frontend application in the `app/` folder of your CAP project.
 
 ```js
 // app/my-vite-app/vite.config.js
