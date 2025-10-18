@@ -8,6 +8,9 @@ A [vite](https://vitejs.dev/) plugin for the [SAP Cloud Application Programming 
 
 ## Usage
 
+Prerequisite:
+- This library has a peer dependency to [@sap/cds](https://www.npmjs.com/package/@sap/cds).
+
 ### Run vite apps via `cds watch`
 
 Install vite and the plugin as development dependencies in the root of your CAP project.
