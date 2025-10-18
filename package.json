@@ -17,7 +17,7 @@
         "vite": "^7"
     },
     "workspaces": [
-        "test/cap-app"
+        "test/*"
     ],
     "author": "johannes@vogt.codes"
 }
