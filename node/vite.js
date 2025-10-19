@@ -27,6 +27,7 @@ export function nodeVite() {
     config() {
       return {
         define: {
+          bootstrap: windowBootstrap, // also load in workers
           'process.env.NODE_ENV': 'process.env.NODE_ENV', // Prevent vite from writing this
         },
         resolve: {

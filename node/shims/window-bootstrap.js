@@ -10,4 +10,4 @@
   g.__dirname = '<unknown>'
   g.require = () => {}
   g.require.resolve = () => {}
-})();
+})()
