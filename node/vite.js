@@ -24,10 +24,10 @@ export function nodeVite() {
   return {
     name: 'node',
 
+    enforce: 'pre',
     config() {
       return {
         define: {
-          bootstrap: windowBootstrap, // also load in workers
           'process.env.NODE_ENV': 'process.env.NODE_ENV', // Prevent vite from writing this
         },
         resolve: {
@@ -36,9 +36,21 @@ export function nodeVite() {
             ...Object.fromEntries(Object.entries(nodeMocks).map(([k,v]) => ['node:' + k, v])),
           }
         },
+        worker: {
+          rollupOptions: {
+            output: {
+              banner: windowBootstrap,
+            }
+          }
+        }
       };
     },
-
+    transform(code, id) {
+      if (/\.(m?[jt]sx?)$/.test(id)) {
+        return `${windowBootstrap}\n${code}`;
+      }
+      return null;
+    },
     transformIndexHtml() {
       return [
         {
