@@ -24,7 +24,6 @@ export function nodeVite() {
   return {
     name: 'node',
 
-    enforce: 'pre',
     config() {
       return {
         define: {
@@ -46,20 +45,10 @@ export function nodeVite() {
       };
     },
     transform(code, id) {
-      if (/\.(m?[jt]sx?)$/.test(id)) {
+      if (/node_modules\/vite\/dist\/client\/env.mjs$/.test(id)) {
         return `${windowBootstrap}\n${code}`;
       }
       return null;
-    },
-    transformIndexHtml() {
-      return [
-        {
-          tag: 'script',
-          // Inline so it runs immediately before other scripts
-          children: windowBootstrap,
-          injectTo: 'head',
-        },
-      ];
     },
   };
 }
