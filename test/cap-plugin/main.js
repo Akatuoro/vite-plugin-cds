@@ -22,3 +22,7 @@ worker.addEventListener('message', event => {
     }
     appDiv.appendChild(resultPre);
 });
+
+import express from 'express';
+const app = express();
+cds.serve().from(csn).in(app);

@@ -4,6 +4,10 @@
   proc.env = Object.assign({}, proc.env || {}, g.__ENV__ || {});
   proc.cwd = () => null;
   g.process = proc;
+  proc.stdout ??= {}
+  proc.stderr ??= {}
+  proc.stdin ??= {}
+  proc.argv ??= ['<unknown>']
 
   g.global ??= globalThis
   g.__filename = '<unknown>'
