@@ -18,7 +18,7 @@ export function nodeVite() {
   const windowBootstrap = fs.readFileSync(path.resolve(__dirname, 'shims/window-bootstrap.js'), 'utf-8');
 
   const nodeMocks = fromEntries([
-    'events', 'fs', 'fs/promises', 'path', 'async_hooks', 'util'
+    'events', 'fs', 'fs/promises', 'path', 'async_hooks', 'util', 'express'
   ].map( m => [m, resolve(path.join(__dirname, 'polyfills', m))] ))
 
   return {
