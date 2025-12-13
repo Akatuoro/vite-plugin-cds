@@ -1,6 +1,7 @@
 import path from 'path';
 import fs from 'fs/promises';
 import { fileURLToPath } from 'url';
+import { insertFileDir } from './helpers';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -68,19 +69,88 @@ export function capESBuild() {
 
       build.onLoad({ filter: /\.[cm]?jsx?$/ }, async (args) => {
         let code = await fs.readFile(args.path, 'utf8');
-        if (!code.includes('lazyload(')) return; // fast path
+
+        // fill in preloaded modules
+        if (args.path == path.join(__dirname, 'shims/preload-modules.js')) {
+          // TODO: configurable preload modules
+          // const preloadModules = [
+          //   // path.join(ccds, 'srv/protocols/*.js')
+          //   './../../node_modules/@sap/cds/lib/srv/protocols/*'
+          // ];
+          // code = code.replace('// <placeholder>', preloadModules.map(m => `"${m}"`).join(',\n'));
+          console.log(code);
+          return { contents: code, loader: 'js' };
+        };
 
         // Simple check whether we're in a cds-compiler
-        if (ccoms.every(c => !isPathInside(args.path, c))) return;
+        if (ccoms.some(c => isPathInside(args.path, c))) {
+          if (!code.includes('lazyload(')) return; // fast path
 
-        // Replace lazyload('pkg') with require('pkg') for string literals only
-        const replaced = code
-          .replace(/\blazyload\s*\(\s*(['"`])([^'"`]+)\1\s*\)/g, 'require($1$2$1)');
+          // Replace lazyload('pkg') with require('pkg') for string literals only
+          code = code
+            .replace(/\blazyload\s*\(\s*(['"`])([^'"`]+)\1\s*\)/g, 'require($1$2$1)');
 
-        if (replaced === code) return; // no changes
-        return { contents: replaced, loader: 'js' };
+          return { contents: code, loader: 'js' };
+        }
+
+        // Check whether we're inside the cds runtime
+        if (isPathInside(args.path, ccds)) {
+          code = `require("${resolve(__dirname + '/shims/preload-modules.js')}")\n` + code;
+
+          code = insertFileDir(code, args.path);
+
+          return { contents: code, loader: 'js' };
+        }
       });
 
+
+      // ======== service factory polyfill ========
+      build.onResolve({ filter : /.*factory.*/ }, async args => {
+      // build.onResolve({ filter : /.*@sap\/cds\/lib\/srv\/factory.*/ }, async args => {
+        const pluginData = args.pluginData || {};
+        if (pluginData[visited]) return; // avoid loops
+
+        pluginData[visited] = true;
+
+        const { resolveDir, importer, kind } = args;
+        const resolved = await build.resolve(args.path, {
+          resolveDir,
+          importer,
+          kind,
+          pluginData,
+        });
+
+        if ( resolved.path === path.join(ccds, 'srv/factory.js')) {
+          return { path: path.join(__dirname, 'polyfills/srv/factory.js') };
+        }
+
+        return null;
+      });
+
+
+      // ======== auth middleware redirect ========
+      build.onResolve({ filter : /.*auth.*/ }, async args => {
+      // build.onResolve({ filter : /.*@sap\/cds\/lib\/srv\/factory.*/ }, async args => {
+        const pluginData = args.pluginData || {};
+        if (pluginData[visited]) return; // avoid loops
+
+        pluginData[visited] = true;
+
+        const { resolveDir, importer, kind } = args;
+        const resolved = await build.resolve(args.path, {
+          resolveDir,
+          importer,
+          kind,
+          pluginData,
+        });
+
+        if ( resolved.path === path.join(ccds, 'srv/middlewares/auth/index.js')) {
+          return { path: path.join(__dirname, 'polyfills/srv/middlewares/auth/index.js') };
+          // return { path: path.join(ccds, 'srv/middlewares/auth/basic-auth.js') };
+        }
+
+        return null;
+      });
     },
   };
 }

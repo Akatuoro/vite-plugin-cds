@@ -12,6 +12,12 @@
   g.global ??= globalThis
   g.__filename = '<unknown>'
   g.__dirname = '<unknown>'
-  g.require = () => {}
-  g.require.resolve = () => {}
+  g.require = (path) => {
+    console.log('require', path);
+    return g.modules?.[path];
+  }
+  g.require.resolve = (path) => {
+    console.log('require.resolve', path);
+    return path;
+  }
 })()

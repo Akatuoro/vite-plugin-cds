@@ -1,0 +1,275 @@
+{
+  "_context": "cds",
+  "_profiles": {
+    "_defined": {}
+  },
+  "production": false,
+  "requires": {
+    "middlewares": true,
+    "queue": {
+      "model": "@sap/cds/srv/outbox",
+      "maxAttempts": 20,
+      "chunkSize": 10,
+      "parallel": true,
+      "storeLastError": true,
+      "timeout": "1h",
+      "legacyLocking": true,
+      "ignoredContext": [
+        "user",
+        "http",
+        "model",
+        "timestamp",
+        "_locale",
+        "_features"
+      ],
+      "kind": "persistent-queue"
+    },
+    "auth": {
+      "restrict_all_services": false,
+      "kind": "mocked",
+      "users": {
+        "alice": {
+          "tenant": "t1",
+          "roles": [
+            "admin"
+          ]
+        },
+        "bob": {
+          "tenant": "t1",
+          "roles": [
+            "cds.ExtensionDeveloper"
+          ]
+        },
+        "carol": {
+          "tenant": "t1",
+          "roles": [
+            "admin",
+            "cds.ExtensionDeveloper"
+          ]
+        },
+        "dave": {
+          "tenant": "t1",
+          "roles": [
+            "admin"
+          ],
+          "features": []
+        },
+        "erin": {
+          "tenant": "t2",
+          "roles": [
+            "admin",
+            "cds.ExtensionDeveloper"
+          ]
+        },
+        "fred": {
+          "tenant": "t2",
+          "features": [
+            "isbn"
+          ]
+        },
+        "me": {
+          "tenant": "t1",
+          "features": [
+            "*"
+          ]
+        },
+        "yves": {
+          "roles": [
+            "internal-user"
+          ]
+        },
+        "*": true
+      },
+      "tenants": {
+        "t1": {
+          "features": [
+            "isbn"
+          ]
+        },
+        "t2": {
+          "features": "*"
+        }
+      }
+    }
+  },
+  "runtime": {
+    "patch_as_upsert": false,
+    "put_as_upsert": true,
+    "put_as_replace": false
+  },
+  "server": {
+    "shutdown_on_uncaught_errors": true,
+    "exit_on_multi_install": true,
+    "force_exit_timeout": 1111,
+    "cors": true,
+    "index": true,
+    "port": 4004
+  },
+  "protocols": {
+    "odata-v4": {
+      "path": "/odata/v4"
+    },
+    "odata-v2": {
+      "path": "/odata/v2"
+    },
+    "rest": {
+      "path": "/rest"
+    },
+    "hcql": {
+      "path": "/hcql"
+    }
+  },
+  "features": {
+    "folders": "fts/*",
+    "sql_simple_queries": 0,
+    "pre_compile_edmxs": false,
+    "live_reload": true,
+    "in_memory_db": true,
+    "test_data": true,
+    "test_mocks": true,
+    "with_mocks": true,
+    "mocked_bindings": true,
+    "skip_unused": true,
+    "deploy_data_onconflict": "insert",
+    "assert_integrity": false,
+    "precise_timestamps": false,
+    "consistent_params": true
+  },
+  "fiori": {
+    "preview": {
+      "ui5": {
+        "version": "1.141.0",
+        "theme": {
+          "light": "sap_horizon",
+          "dark": "sap_horizon_dark",
+          "switch": true
+        }
+      }
+    },
+    "routes": true,
+    "lean_draft": true,
+    "wrap_multiple_errors": true,
+    "draft_lock_timeout": true,
+    "draft_deletion_timeout": true,
+    "draft_messages": true
+  },
+  "ql": {},
+  "log": {
+    "levels": {
+      "compile": "warn",
+      "cli": "warn"
+    },
+    "service": false,
+    "user": false,
+    "mask_headers": [
+      "/authorization/i",
+      "/cookie/i",
+      "/cert/i",
+      "/ssl/i"
+    ],
+    "aspects": [
+      "./aspects/cf",
+      "./aspects/als",
+      "./aspects/cls"
+    ],
+    "als_custom_fields": {
+      "query": 0,
+      "target": 1,
+      "details": 2,
+      "reason": 3
+    },
+    "cls_custom_fields": [
+      "query",
+      "target",
+      "details",
+      "reason"
+    ],
+    "format": "plain"
+  },
+  "folders": {
+    "db": "db/",
+    "srv": "srv/",
+    "app": "app/"
+  },
+  "i18n": {
+    "file": "i18n",
+    "folders": [
+      "_i18n",
+      "i18n"
+    ],
+    "languages": "all",
+    "default_language": "en",
+    "preserved_locales": [
+      "en_GB",
+      "es_CO",
+      "es_MX",
+      "fr_CA",
+      "pt_PT",
+      "zh_CN",
+      "zh_HK",
+      "zh_TW"
+    ],
+    "fallback_bundle": "",
+    "fatjson": true
+  },
+  "odata": {
+    "flavors": {
+      "v2": {
+        "version": "v2"
+      },
+      "v4": {
+        "version": "v4"
+      },
+      "w4": {
+        "version": "v4",
+        "containment": true,
+        "structs": true,
+        "refs": false,
+        "xrefs": false
+      },
+      "x4": {
+        "version": "v4",
+        "containment": true,
+        "structs": true,
+        "refs": true,
+        "xrefs": true
+      }
+    },
+    "version": "v4",
+    "context_with_columns": false,
+    "max_batch_header_size": "64KiB"
+  },
+  "sql": {
+    "names": "plain",
+    "dialect": "sqlite"
+  },
+  "hana": {
+    "deploy-format": "hdbtable",
+    "journal": {
+      "change-mode": "alter"
+    },
+    "table_data": {
+      "column_mapping": {
+        "LargeBinary": "decodeBase64"
+      }
+    }
+  },
+  "build": {
+    "target": "gen"
+  },
+  "cdsc": {
+    "moduleLookupDirectories": [
+      "node_modules/"
+    ]
+  },
+  "query": {
+    "limit": {
+      "max": 1000
+    }
+  },
+  "config": {
+    "log": {
+      "format": "plain"
+    }
+  }
+}

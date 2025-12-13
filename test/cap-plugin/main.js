@@ -1,4 +1,7 @@
 import cds from '@sap/cds';
+import * as a from '@sap/cds/lib/srv/factory.js'
+import { serve } from './serve.js'
+window.a = a
 
 const model = 'entity Browser {key ID: Integer; name: String}';
 const csn = cds.compile(model);
@@ -23,6 +26,5 @@ worker.addEventListener('message', event => {
     appDiv.appendChild(resultPre);
 });
 
-import express from 'express';
-const app = express();
-cds.serve().from(csn).in(app);
+await serve();
+

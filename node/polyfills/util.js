@@ -58,6 +58,7 @@ export function inherits(ctor, superCtor) {
  * @returns {string} - The formatted string.
  */
 export function format(format, ...args) {
+  if (typeof format !== 'string') return format;
   let i = 0;
   return format.replace(/%[sdj%]/g, (match) => {
     if (match === '%%') return '%';

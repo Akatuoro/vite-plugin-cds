@@ -52,6 +52,19 @@ class Path {
   normalize(path) {
     return this.resolve(path);
   }
+
+  // Parse a path into { root, dir, base, ext, name }
+  parse(path) {
+    const root = path.startsWith('/') ? '/' : '';
+    const parts = path.split('/').filter(Boolean);
+    const base = parts.pop() || '';
+    const dir = root + parts.join('/');
+    const ext = this.extname(base);
+    const name = ext ? base.slice(0, -ext.length) : base;
+
+    return { root, dir, base, ext, name };
+  }
+
 }
 
 // Export the in-memory path module
