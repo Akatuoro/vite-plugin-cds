@@ -153,9 +153,14 @@ class MiniExpress {
       if (res.finished) return;
       const handler = handlers[i++];
       if (!handler) return next();
-      const maybePromise = handler(req, res, runner);
-      if (maybePromise && typeof maybePromise.then === 'function') {
-        await maybePromise;
+      if (handler.constructor === Array) {
+        await this._runHandlers(handler, req, res, runner);
+      }
+      else {
+        const maybePromise = handler(req, res, runner);
+        if (maybePromise && typeof maybePromise.then === 'function') {
+          await maybePromise;
+        }
       }
     };
     await runner();

@@ -20,6 +20,7 @@
         "cds-plugin.js",
         "index.js"
     ],
+    "type": "module",
     "scripts": {
         "test": "echo \"Everything ok! (TODO: add tests)\""
     },
