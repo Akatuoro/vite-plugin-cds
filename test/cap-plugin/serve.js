@@ -19,7 +19,7 @@ export const serve = async () => {
     const app = express();
     await cds.serve('all', {}, env).from(csn).in(app);
 
-    window.app = app;
+    globalThis.app = app;
 
     app.listen(8080)
 }
