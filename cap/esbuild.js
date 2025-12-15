@@ -72,13 +72,20 @@ export function capESBuild() {
 
         // fill in preloaded modules
         if (args.path == path.join(__dirname, 'shims/preload-modules.js')) {
-          // TODO: configurable preload modules
-          // const preloadModules = [
-          //   // path.join(ccds, 'srv/protocols/*.js')
-          //   './../../node_modules/@sap/cds/lib/srv/protocols/*'
-          // ];
-          // code = code.replace('// <placeholder>', preloadModules.map(m => `"${m}"`).join(',\n'));
-          console.log(code);
+          const resolveDir = path.dirname(args.path);
+          const importer = args.path;
+          const preloadModules = await Promise.all([
+            '@sap/cds/lib/srv/protocols/odata-v4',
+          ].map(async m => {
+            const resolved = await build.resolve(m, {
+              resolveDir,
+              importer,
+              kind: 'require-call',
+            });
+            return path.relative(resolveDir, resolved.path);
+          }));
+
+          code = code.replace('// <placeholder>', preloadModules.map(m => `'${m}': () => require('${m}')`).join(',\n'));
           return { contents: code, loader: 'js' };
         };
 

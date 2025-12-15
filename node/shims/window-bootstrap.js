@@ -13,11 +13,13 @@
   g.__filename = '<unknown>'
   g.__dirname = '<unknown>'
   g.require = (path) => {
-    console.log('require', path);
-    return g.modules?.[path];
+    const resolved = g.modules?.resolve(path) ?? path;
+    console.log('require:', resolved, path);
+    return g.modules?.[resolved];
   }
   g.require.resolve = (path) => {
-    console.log('require.resolve', path);
-    return path;
+    const resolved = g.modules?.resolve(path) ?? path;
+    console.log('require.resolve', resolved, path);
+    return resolved;
   }
 })()
