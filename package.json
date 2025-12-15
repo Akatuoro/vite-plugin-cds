@@ -22,7 +22,7 @@
     ],
     "type": "module",
     "scripts": {
-        "test": "echo \"Everything ok! (TODO: add tests)\""
+        "test": "node --test ./**/*.test.js"
     },
     "peerDependencies": {
         "@sap/cds": "^9"

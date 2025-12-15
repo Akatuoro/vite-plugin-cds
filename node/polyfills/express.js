@@ -123,16 +123,17 @@ class MiniExpress {
     const layers = this.stack;
     let idx = 0;
 
-    const next = async () => {
+    const next = async (err) => {
       const layer = layers[idx++];
-      if (!layer) return out();
+      if (!layer) return out(err);
 
       if (layer.type === 'middleware') {
-        if (!request.path.startsWith(layer.path)) return next();
-        return this._runHandlers([layer.handler], request, res, next);
+        if (!request.path.startsWith(layer.path)) return next(err);
+        return this._runHandlers([layer.handler], request, res, next, err);
       }
 
       if (layer.type === 'route') {
+        if (err) return next(err);
         if (layer.method !== 'ALL' && layer.method !== request.method) return next();
         const { matched, params } = matchPath(layer.path, request.path);
         if (!matched) return next();
@@ -147,23 +148,31 @@ class MiniExpress {
     return res;
   }
 
-  async _runHandlers(handlers, req, res, next) {
+  async _runHandlers(handlers, req, res, next, err) {
     let i = 0;
-    const runner = async () => {
+    const runner = async (runErr) => {
       if (res.finished) return;
       const handler = handlers[i++];
-      if (!handler) return next();
+      if (!handler) return next(runErr);
       if (handler.constructor === Array) {
-        await this._runHandlers(handler, req, res, runner);
+        await this._runHandlers(handler, req, res, runner, runErr);
       }
       else {
-        const maybePromise = handler(req, res, runner);
-        if (maybePromise && typeof maybePromise.then === 'function') {
-          await maybePromise;
+        const isErrorHandler = handler.length === 4;
+        if (runErr && !isErrorHandler) return runner(runErr);
+        if (!runErr && isErrorHandler) return runner();
+
+        try {
+          const maybePromise = isErrorHandler ? handler(runErr, req, res, runner) : handler(req, res, runner);
+          if (maybePromise && typeof maybePromise.then === 'function') {
+            await maybePromise;
+          }
+        } catch (error) {
+          return runner(error);
         }
       }
     };
-    await runner();
+    await runner(err);
   }
 
   listen(_port, cb) {
