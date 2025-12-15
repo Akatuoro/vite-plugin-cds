@@ -1,8 +1,12 @@
-class ResponseMock {
+import { EventEmitter } from 'events';
+
+class ResponseMock extends EventEmitter {
   constructor() {
+    super();
     this.statusCode = 200;
     this.headers = {};
     this.body = undefined;
+    this._chunks = [];
     this.finished = false;
   }
 
@@ -26,21 +30,39 @@ class ResponseMock {
     if (!this.headers['content-type']) {
       this.headers['content-type'] = 'application/json';
     }
-    this.body = JSON.stringify(data);
-    this.finished = true;
-    return this;
+    return this.end(JSON.stringify(data));
   }
 
   send(data) {
-    this.body = data;
-    this.finished = true;
-    return this;
+    return this.end(data);
   }
 
   end(data) {
-    if (data !== undefined) this.body = data;
+    if (data !== undefined) this.write(data);
+    this.body = this._collectBody();
     this.finished = true;
+    this.emit('finish');
     return this;
+  }
+
+  write(chunk) {
+    if (chunk === undefined || chunk === null) return this;
+    this._chunks.push(typeof chunk === 'string' ? chunk : chunk.toString());
+    return this;
+  }
+
+  writeHead(statusCode, headers = {}) {
+    this.statusCode = statusCode;
+    this.set(headers);
+    return this;
+  }
+
+  setHeader(name, value) { return this.set(name, value); }
+  getHeader(name) { return this.headers[name?.toLowerCase()]; }
+
+  _collectBody() {
+    if (this._chunks.length === 0) return this.body;
+    return this._chunks.join('');
   }
 }
 
@@ -85,16 +107,39 @@ class MiniExpress {
     const fns = hasPath ? handlers : [pathOrHandler, ...handlers];
 
     for (const fn of fns) {
-      this.stack.push({ type: 'middleware', path, handler: this._wrap(fn) });
+      const handler = fn instanceof MiniExpress || typeof fn?.handle === 'function'
+        ? this._wrapRouter(fn, path)
+        : this._wrap(fn);
+      this.stack.push({ type: 'middleware', path, handler });
     }
     return this;
   }
 
   _wrap(handler) {
-    if (handler instanceof MiniExpress) {
-      return (req, res, next) => handler.handle(req, res, next);
-    }
     return handler;
+  }
+
+  _wrapRouter(router, mountPath) {
+    const base = normalizePath(mountPath);
+    return async (req, res, next) => {
+      if (!req.path.startsWith(base)) return next();
+
+      const originalUrl = req.url || req.path || '/';
+      const originalPath = req.path || '/';
+      const originalBaseUrl = req.baseUrl || '';
+
+      req.baseUrl = originalBaseUrl + base;
+      req.url = normalizePath(originalUrl.slice(base.length) || '/');
+      req.path = normalizePath(originalPath.slice(base.length) || '/');
+
+      try {
+        await router.handle(req, res, next);
+      } finally {
+        req.baseUrl = originalBaseUrl;
+        req.url = originalUrl;
+        req.path = originalPath;
+      }
+    };
   }
 
   _addRoute(method, path, handlers) {
