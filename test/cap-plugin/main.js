@@ -1,6 +1,8 @@
 import cds from '@sap/cds';
 import * as a from '@sap/cds/lib/srv/factory.js'
 import { serve } from './serve.js'
+// import { initializeSQLite } from './initsqlite.js'
+import sqlite3 from 'better-sqlite3'
 window.a = a
 
 const model = 'entity Browser {key ID: Integer; name: String}';
@@ -25,6 +27,14 @@ worker.addEventListener('message', event => {
     }
     appDiv.appendChild(resultPre);
 });
+
+await sqlite3.initialized;
+
+const db = new sqlite3(':memory:', 'ct');
+db.exec("create table t(a);");
+db.exec("insert into t(a) values(10),(20),(30);");
+const row = db.prepare('SELECT * FROM t').get();
+console.log(row.a);
 
 await serve();
 

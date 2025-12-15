@@ -15,7 +15,7 @@
   g.require = (path) => {
     const resolved = g.modules?.resolve(path) ?? path;
     console.log('require:', resolved, path);
-    return g.modules?.[resolved];
+    return g.modules?.[resolved] ?? g.fs?.readFileSync(resolved);
   }
   g.require.resolve = (path) => {
     const resolved = g.modules?.resolve(path) ?? path;

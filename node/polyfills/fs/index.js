@@ -1,4 +1,4 @@
-class InMemoryFS {
+export class InMemoryFS {
   constructor() {
     this.files = {};
   }
@@ -66,7 +66,8 @@ class InMemoryFS {
   }
 }
 
-// Export the in-memory fs
-const fs = new InMemoryFS();
-export default fs;
+globalThis.fs ??= new InMemoryFS();
 
+// Export the in-memory fs
+const fs = globalThis.fs;
+export default fs;

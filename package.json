@@ -29,6 +29,7 @@
     },
     "devDependencies": {
         "@sap/cds": "^9",
+        "@sqlite.org/sqlite-wasm": "^3",
         "vite": "^7"
     },
     "workspaces": [
