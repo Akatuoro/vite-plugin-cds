@@ -23,6 +23,10 @@ await cds.serve('all', {}, env).from(csn).in(app);
 globalThis.app = app;
 
 app.listen(8080)
-const response = await app.handle({url: '/odata/v4/catalog'})
+// const response = await app.handle({url: '/odata/v4/catalog'})
 
-console.log(response);
+// console.log(response);
+
+const response2 = await app.handle({url: '/odata/v4/catalog/Books'})
+
+console.log(response2);
