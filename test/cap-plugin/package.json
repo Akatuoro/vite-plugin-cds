@@ -5,6 +5,7 @@
         "start": "vite"
     },
     "devDependencies": {
+        "@cap-js/sqlite": "^2",
         "@sap/cds": "^9",
         "vite": "^7"
     },

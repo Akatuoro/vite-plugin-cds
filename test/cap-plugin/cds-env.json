@@ -90,6 +90,13 @@
           "features": "*"
         }
       }
+    },
+    "db": {
+      "impl": "@cap-js/sqlite",
+      "credentials": {
+        "url": ":memory:"
+      },
+      "kind": "sqlite"
     }
   },
   "runtime": {
@@ -265,6 +272,11 @@
   "query": {
     "limit": {
       "max": 1000
+    }
+  },
+  "plugins": {
+    "@cap-js/sqlite": {
+      "impl": "@cap-js/sqlite/cds-plugin.js"
     }
   },
   "config": {
