@@ -128,16 +128,26 @@ class MiniExpress {
       const originalPath = req.path || '/';
       const originalBaseUrl = req.baseUrl || '';
 
+      let delegated = false;
+      const wrappedNext = async (err) => {
+        delegated = true;
+        return next(err);
+      };
+
       req.baseUrl = originalBaseUrl + base;
       req.url = normalizePath(originalUrl.slice(base.length) || '/');
       req.path = normalizePath(originalPath.slice(base.length) || '/');
 
       try {
-        await router.handle(req, res, next);
+        await router.handle(req, res, wrappedNext);
       } finally {
         req.baseUrl = originalBaseUrl;
         req.url = originalUrl;
         req.path = originalPath;
+      }
+
+      if (!delegated && !res.finished) {
+        return next();
       }
     };
   }
@@ -155,6 +165,7 @@ class MiniExpress {
   all(path, ...handlers) { this._addRoute('ALL', path, handlers); return this; }
 
   async handle(req = {}, res = new ResponseMock(), out = () => {}) {
+    const response = res || new ResponseMock();
     const request = {
       method: (req.method || 'GET').toUpperCase(),
       path: normalizePath(req.path || req.url || '/'),
@@ -165,16 +176,40 @@ class MiniExpress {
       ...req,
     };
 
+    request.get = request.get || request.header || ((name) => {
+      if (!name) return undefined;
+      return request.headers?.[name.toLowerCase()];
+    });
+    request.header = request.header || request.get;
+
     const layers = this.stack;
     let idx = 0;
 
+    const finalize = async (err) => {
+      await out(err);
+
+      if (err && !response.finished) {
+        response.status(err.status || err.statusCode || 500);
+        const body = err.body || {
+          error: {
+            message: err.message,
+            code: err.code,
+            '@Common.numericSeverity': err.numericSeverity,
+          },
+        };
+        response.json(body);
+      }
+
+      return response;
+    };
+
     const next = async (err) => {
       const layer = layers[idx++];
-      if (!layer) return out(err);
+      if (!layer) return finalize(err);
 
       if (layer.type === 'middleware') {
         if (!request.path.startsWith(layer.path)) return next(err);
-        return this._runHandlers([layer.handler], request, res, next, err);
+        return this._runHandlers([layer.handler], request, response, next, err);
       }
 
       if (layer.type === 'route') {
@@ -183,14 +218,17 @@ class MiniExpress {
         const { matched, params } = matchPath(layer.path, request.path);
         if (!matched) return next();
         request.params = params;
-        return this._runHandlers(layer.handlers, request, res, next);
+        return this._runHandlers(layer.handlers, request, response, next);
       }
 
       return next();
     };
 
     await next();
-    return res;
+    if (!response.finished) {
+      await new Promise((resolve) => response.once('finish', resolve));
+    }
+    return response;
   }
 
   async _runHandlers(handlers, req, res, next, err) {
