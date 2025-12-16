@@ -162,6 +162,7 @@ class MiniExpress {
   put(path, ...handlers) { this._addRoute('PUT', path, handlers); return this; }
   delete(path, ...handlers) { this._addRoute('DELETE', path, handlers); return this; }
   patch(path, ...handlers) { this._addRoute('PATCH', path, handlers); return this; }
+  head(path, ...handlers) { this._addRoute('HEAD', path, handlers); return this; }
   all(path, ...handlers) { this._addRoute('ALL', path, handlers); return this; }
 
   async handle(req = {}, res = new ResponseMock(), out = () => {}) {
@@ -214,7 +215,11 @@ class MiniExpress {
 
       if (layer.type === 'route') {
         if (err) return next(err);
-        if (layer.method !== 'ALL' && layer.method !== request.method) return next();
+        if (
+          layer.method !== 'ALL'
+          && layer.method !== request.method
+          && !(request.method === 'HEAD' && layer.method === 'GET')
+        ) return next();
         const { matched, params } = matchPath(layer.path, request.path);
         if (!matched) return next();
         request.params = params;
@@ -227,6 +232,10 @@ class MiniExpress {
     await next();
     if (!response.finished) {
       await new Promise((resolve) => response.once('finish', resolve));
+    }
+    if (request.method === 'HEAD') {
+      response.body = undefined;
+      response._chunks = [];
     }
     return response;
   }
