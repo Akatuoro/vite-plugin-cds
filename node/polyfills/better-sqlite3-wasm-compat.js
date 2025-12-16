@@ -165,6 +165,10 @@ export function createBetterSqlite3Like(sqlite3, {
     changes() {
       return this._db.changes();
     }
+
+    SQLite3Error(...args) {
+        return new Error(...args); // TODO
+    }
   }
 
   return { Database };

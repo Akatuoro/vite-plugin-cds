@@ -3,4 +3,8 @@ export class EventEmitter extends EventTarget {
         const event = new Event(eventName, { bubbles: true, cancelable: false });
         this.dispatchEvent(event);
     }
+
+    on(eventName, cb) {
+        // TODO
+    }
 }

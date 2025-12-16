@@ -2,6 +2,7 @@ import cds from '@sap/cds';
 import express from 'express';
 import env from './cds-env.json';
 import fs from 'fs';
+import sqlite from 'better-sqlite3';
 
 
 export const serve = async () => {
@@ -15,6 +16,7 @@ export const serve = async () => {
     }`;
     const csn = cds.compile(model);
 
+    await sqlite.initialized;
     // const modules = import.meta.glob(['./../../node_modules/@sap/cds/lib/srv/protocols/*'])
     // window.modules = modules
 

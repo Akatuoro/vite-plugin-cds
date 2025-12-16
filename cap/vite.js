@@ -15,7 +15,7 @@ export function capVite() {
     config() {
       return {
         optimizeDeps: {
-          include: [ '@sap/cds', '@sap/cds-compiler' ],
+          include: [ '@sap/cds', '@sap/cds-compiler', '@cap-js/sqlite' ],
           esbuildOptions: {
             plugins: [capESBuild()],
           },

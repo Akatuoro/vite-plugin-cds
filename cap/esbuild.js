@@ -9,6 +9,7 @@ const __dirname = path.dirname(__filename);
 const resolve = path => fileURLToPath(import.meta.resolve(path));
 
 const ccds = path.dirname(resolve('@sap/cds'));
+const csqlite = path.dirname(resolve('@cap-js/sqlite'));
 const ccom1 = path.dirname(resolve('@sap/cds-compiler'));
 const ccom2 = path.dirname(resolve('@sap/cds-compiler', { paths: [ccds] }));
 const ccoms = [ccom1, ccom2];
@@ -117,6 +118,14 @@ export function capESBuild() {
 
           // Fix cjs / esm interop
           code = code.replace("Object.assign (exports,require('fs'))", "require('fs').default ?? require('fs')");
+
+          return { contents: code, loader: 'js' };
+        }
+
+        // Check whether we're inside the cds sqlite driver
+        if (isPathInside(args.path, csqlite)) {
+          // Fix cjs / esm interop
+          code = code.replace("require('better-sqlite3')", "require('better-sqlite3').default ?? require('better-sqlite3')");
 
           return { contents: code, loader: 'js' };
         }
