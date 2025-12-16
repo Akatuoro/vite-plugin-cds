@@ -1,3 +1,5 @@
+import Buffer from '../buffer.js';
+
 async function collect(readable) {
   if (!readable || typeof readable[Symbol.asyncIterator] !== 'function') {
     throw new TypeError('Provided value is not an async iterable stream');
