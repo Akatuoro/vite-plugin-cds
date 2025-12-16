@@ -36,6 +36,8 @@ test('skips normal handlers while an error is active and resumes once cleared', 
     next();
   });
 
+  app.use((_req, res) => res.send('done'));
+
   await app.handle();
 
   assert.deepStrictEqual(calls, ['before-error', 'error:bad', 'after-error']);
@@ -55,4 +57,30 @@ test('propagates thrown errors to error middleware', async () => {
   const res = await app.handle({ method: 'GET', path: '/fail' });
 
   assert.strictEqual(res.body, 'caught:thrown');
+});
+
+test('express.text converts body to string form', async () => {
+  const app = express();
+
+  app.use(express.text());
+  app.post('/txt', (req, res) => {
+    res.send(req.body);
+  });
+
+  const res = await app.handle({ method: 'POST', path: '/txt', body: Buffer.from('hello') });
+
+  assert.strictEqual(res.body, 'hello');
+});
+
+test('express.text populates missing body with empty string', async () => {
+  const app = express();
+
+  app.use(express.text());
+  app.post('/txt', (req, res) => {
+    res.send(req.body === '' ? 'empty' : 'not-empty');
+  });
+
+  const res = await app.handle({ method: 'POST', path: '/txt' });
+
+  assert.strictEqual(res.body, 'empty');
 });

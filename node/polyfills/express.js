@@ -271,7 +271,36 @@ function express() {
 }
 
 express.application = {};
-express.text = () => () => '' // TODO
+express.text = (options = {}) => {
+  const encoding = options.encoding || 'utf-8';
+
+  return (req, _res, next) => {
+    if (typeof req.body === 'string') return next();
+
+    if (req.body === undefined || req.body === null) {
+      req.body = '';
+      return next();
+    }
+
+    if (req.body instanceof Buffer) {
+      req.body = req.body.toString(encoding);
+      return next();
+    }
+
+    if (ArrayBuffer.isView(req.body)) {
+      req.body = Buffer.from(req.body.buffer, req.body.byteOffset, req.body.byteLength).toString(encoding);
+      return next();
+    }
+
+    if (req.body instanceof ArrayBuffer) {
+      req.body = Buffer.from(req.body).toString(encoding);
+      return next();
+    }
+
+    req.body = String(req.body);
+    return next();
+  };
+};
 
 express.Router = function Router() {
   return new MiniExpress();
