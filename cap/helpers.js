@@ -40,7 +40,6 @@ export const insertFileDir = (code, id) => {
         /\b__dirname\b/g,
         JSON.stringify(relDir === "." ? "" : relDir)
     );
-    console.log('transformed', id)
 
     return transformed;
 }

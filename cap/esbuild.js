@@ -78,6 +78,7 @@ export function capESBuild() {
           const preloadModules = (await Promise.all([
             '@sap/cds/lib/srv/protocols/odata-v4',
             '@sap/cds/lib/srv/factory',
+            '@sap/cds/srv/app-service.js',
             '@sap/cds/lib/env/defaults',
             '@cap-js/sqlite'
           ].map(async m => {
@@ -92,7 +93,6 @@ export function capESBuild() {
               { s: m, t: rel },
             ];
           }))).flat();
-          console.log(preloadModules)
           preloadModules.push({s: './defaults', t: preloadModules.find(({s}) => s === '@sap/cds/lib/env/defaults').t });
 
           code = code.replace('// <placeholder>', preloadModules.map(({s, t}) => `'${s}': () => require('${t}')`).join(',\n'));
@@ -118,6 +118,14 @@ export function capESBuild() {
 
           // Fix cjs / esm interop
           code = code.replace("Object.assign (exports,require('fs'))", "require('fs').default ?? require('fs')");
+          code = code.replace("require('express')", "require('express').default ?? require('express')");
+
+          return { contents: code, loader: 'js' };
+        }
+
+        // Check whether we're inside cds libx
+        if (isPathInside(args.path, path.join(path.dirname(ccds), 'libx'))) {
+          code = code.replace("require('express')", "require('express').default ?? require('express')");
 
           return { contents: code, loader: 'js' };
         }

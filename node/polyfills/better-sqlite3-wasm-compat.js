@@ -40,7 +40,7 @@ export function createBetterSqlite3Like(sqlite3, {
       const bind = normalizeBindArgs(bindArgs);
       const stmt = this._stmt;
       try {
-        if (bind !== undefined) stmt.bind(bind);
+        if (bind !== undefined && !!stmt.parameterCount) stmt.bind(bind);
         // For INSERT/UPDATE/DELETE, stepping executes it.
         while (stmt.step()) { /* ignore rows */ }
       } finally {
@@ -151,9 +151,15 @@ export function createBetterSqlite3Like(sqlite3, {
       return trx;
     }
 
-    function(name, fn, options) {
-      // better-sqlite3: db.function(name, fn, opts?)
+    function(name, fnOrOptions, maybeOptions) {
+      // better-sqlite3: db.function(name, fn, opts?) or db.function(name, opts, fn)
       // oo1: db.createFunction(name, fn, opts?) :contentReference[oaicite:2]{index=2}
+      const isOptionsObject = typeof fnOrOptions === "object" && fnOrOptions !== null;
+      const isFn = typeof fnOrOptions === "function";
+
+      const fn = isFn ? fnOrOptions : maybeOptions;
+      const options = isOptionsObject && typeof maybeOptions === "function" ? fnOrOptions : maybeOptions;
+
       this._db.createFunction(name, fn, options);
       return this;
     }

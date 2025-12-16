@@ -264,9 +264,14 @@ class MiniExpress {
   }
 }
 
+MiniExpress.application = {};
+
 function express() {
   return new MiniExpress();
 }
+
+express.application = {};
+express.text = () => () => '' // TODO
 
 express.Router = function Router() {
   return new MiniExpress();

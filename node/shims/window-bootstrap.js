@@ -19,8 +19,12 @@
   }
   g.require.resolve = (path) => {
     const resolved = g.modules?.resolve(path) ?? path;
-    if (!modules?.[resolved] && !g.fs?.existsSync(path)) throw new Error(`Path ${path} not found`)
     console.log('require.resolve', resolved, path);
+    if (!modules?.[resolved] && !g.fs?.existsSync(path)) {
+      const e = new Error(`Path ${path} not found`);
+      e.code = 'MODULE_NOT_FOUND';
+      throw e;
+    } 
     return resolved;
   }
 })()
