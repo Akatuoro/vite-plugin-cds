@@ -18,6 +18,7 @@ export function capVite() {
           include: [ '@sap/cds', '@sap/cds-compiler', '@cap-js/sqlite' ],
           esbuildOptions: {
             plugins: [capESBuild()],
+            keepNames: true
           },
         },
         resolve: {

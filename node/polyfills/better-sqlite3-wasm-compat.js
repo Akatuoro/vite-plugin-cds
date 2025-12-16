@@ -58,7 +58,7 @@ export function createBetterSqlite3Like(sqlite3, {
       const bind = normalizeBindArgs(bindArgs);
       const stmt = this._stmt;
       try {
-        if (bind !== undefined) stmt.bind(bind);
+        if (bind !== undefined && !!stmt.parameterCount) stmt.bind(bind);
         const hasRow = stmt.step();
         if (!hasRow) return undefined;
         return this._raw ? stmt.get([]) : stmt.get({});
@@ -72,7 +72,7 @@ export function createBetterSqlite3Like(sqlite3, {
       const stmt = this._stmt;
       const rows = [];
       try {
-        if (bind !== undefined) stmt.bind(bind);
+        if (bind !== undefined && !!stmt.parameterCount) stmt.bind(bind);
         while (stmt.step()) {
           rows.push(this._raw ? stmt.get([]) : stmt.get({}));
         }
@@ -86,7 +86,7 @@ export function createBetterSqlite3Like(sqlite3, {
       const bind = normalizeBindArgs(bindArgs);
       const stmt = this._stmt;
       try {
-        if (bind !== undefined) stmt.bind(bind);
+        if (bind !== undefined && !!stmt.parameterCount) stmt.bind(bind);
         while (stmt.step()) {
           yield this._raw ? stmt.get([]) : stmt.get({});
         }

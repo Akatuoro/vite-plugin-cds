@@ -6,5 +6,11 @@ export class EventEmitter extends EventTarget {
 
     on(eventName, cb) {
         // TODO
+        this.addEventListener(eventName, cb)
+    }
+
+    once(eventName, cb) {
+        // TODO
+        this.addEventListener(eventName, cb)
     }
 }
