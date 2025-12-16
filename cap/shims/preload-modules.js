@@ -14,6 +14,6 @@ modules.resolve = (p) => {
   p = p.replace(/\.\.\//g, '');
 
   // TODO: proper paths relative to root directory
-  let full = paths.filter(p2 => p2.endsWith(p))[0];
+  let full = paths.filter(p2 => p2.endsWith(p) || p.endsWith(p2))[0];
   if (full) return full;
 }
