@@ -74,18 +74,27 @@ export function capESBuild() {
         if (args.path == path.join(__dirname, 'shims/preload-modules.js')) {
           const resolveDir = path.dirname(args.path);
           const importer = args.path;
-          const preloadModules = await Promise.all([
+          const preloadModules = (await Promise.all([
             '@sap/cds/lib/srv/protocols/odata-v4',
+            '@sap/cds/lib/srv/factory',
+            '@sap/cds/lib/env/defaults',
+            '@cap-js/sqlite'
           ].map(async m => {
             const resolved = await build.resolve(m, {
               resolveDir,
               importer,
               kind: 'require-call',
             });
-            return path.relative(resolveDir, resolved.path);
-          }));
+            const rel = path.relative(resolveDir, resolved.path);
+            return [
+              { s: rel, t: rel },
+              { s: m, t: rel },
+            ];
+          }))).flat();
+          console.log(preloadModules)
+          preloadModules.push({s: './defaults', t: preloadModules.find(({s}) => s === '@sap/cds/lib/env/defaults').t });
 
-          code = code.replace('// <placeholder>', preloadModules.map(m => `'${m}': () => require('${m}')`).join(',\n'));
+          code = code.replace('// <placeholder>', preloadModules.map(({s, t}) => `'${s}': () => require('${t}')`).join(',\n'));
           return { contents: code, loader: 'js' };
         };
 
@@ -106,33 +115,13 @@ export function capESBuild() {
 
           code = insertFileDir(code, args.path);
 
+          // Fix cjs / esm interop
+          code = code.replace("Object.assign (exports,require('fs'))", "require('fs').default ?? require('fs')");
+
           return { contents: code, loader: 'js' };
         }
       });
 
-
-      // ======== service factory polyfill ========
-      build.onResolve({ filter : /.*factory.*/ }, async args => {
-      // build.onResolve({ filter : /.*@sap\/cds\/lib\/srv\/factory.*/ }, async args => {
-        const pluginData = args.pluginData || {};
-        if (pluginData[visited]) return; // avoid loops
-
-        pluginData[visited] = true;
-
-        const { resolveDir, importer, kind } = args;
-        const resolved = await build.resolve(args.path, {
-          resolveDir,
-          importer,
-          kind,
-          pluginData,
-        });
-
-        if ( resolved.path === path.join(ccds, 'srv/factory.js')) {
-          return { path: path.join(__dirname, 'polyfills/srv/factory.js') };
-        }
-
-        return null;
-      });
 
 
       // ======== auth middleware redirect ========

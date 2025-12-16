@@ -27,9 +27,8 @@ export const serve = async () => {
     console.log(fs.files);
 
     const app = express();
-    debugger;
     cds.root = '/home'
-    cds.env = cds.env.for(cds, '/home');
+    cds.env = cds.env.for(cds);
     console.log(cds.env);
     cds.requires = cds.env.requires;
     const o = {

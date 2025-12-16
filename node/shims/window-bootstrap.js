@@ -15,10 +15,11 @@
   g.require = (path) => {
     const resolved = g.modules?.resolve(path) ?? path;
     console.log('require:', resolved, path);
-    return g.modules?.[resolved] ?? g.fs?.readFileSync(resolved);
+    return g.modules?.[resolved]?.() ?? g.fs?.readFileSync(resolved);
   }
   g.require.resolve = (path) => {
     const resolved = g.modules?.resolve(path) ?? path;
+    if (!modules?.[resolved] && !g.fs?.existsSync(path)) throw new Error(`Path ${path} not found`)
     console.log('require.resolve', resolved, path);
     return resolved;
   }
