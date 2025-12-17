@@ -23,7 +23,8 @@ export function nodeVite() {
     .flatMap(([k, v]) => [[k, v], ['node:' + k, v]]))
 
   const libMocks = fromEntries([
-    'express'
+    'express',
+    'better-sqlite3',
   ].map( m => [m, resolve(path.join(__dirname, 'libs', m))] ))
 
   return {
@@ -46,33 +47,9 @@ export function nodeVite() {
               banner: windowBootstrap,
             }
           }
-        }
-      };
-    },
-    transform(code, id) {
-      if (/node_modules\/vite\/dist\/client\/env.mjs$/.test(id)) {
-        return `${windowBootstrap}\n${code}`;
-      }
-      return null;
-    },
-  };
-}
-
-export function sqlite3Vite() {
-  const libMocks = fromEntries([
-    'better-sqlite3'
-  ].map( m => [m, resolve(path.join(__dirname, 'libs', m))] ))
-
-  return {
-    name: 'sqlite3',
-
-    config() {
-      return {
-        resolve: {
-          alias: {
-            ...libMocks,
-          }
         },
+
+        // for sqlite3-wasm
         server: {
           headers: {
             'Cross-Origin-Opener-Policy': 'same-origin',
@@ -83,6 +60,12 @@ export function sqlite3Vite() {
           exclude: ['@sqlite.org/sqlite-wasm'],
         },
       };
-    }
+    },
+    transform(code, id) {
+      if (/node_modules\/vite\/dist\/client\/env.mjs$/.test(id)) {
+        return `${windowBootstrap}\n${code}`;
+      }
+      return null;
+    },
   };
 }
