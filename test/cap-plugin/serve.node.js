@@ -1,7 +1,7 @@
 import cds from '@sap/cds';
-import express from 'express';
-import env from './cds-env.json';
-import fs from 'fs';
+// import express from 'express';
+import express from '../../node/polyfills/express.js';
+import env from './cds-env.json' with { type: 'json' };
 import sqlite from 'better-sqlite3';
 
 
@@ -18,12 +18,8 @@ export const serve = async () => {
 
     await sqlite.initialized;
 
-    fs.writeFileSync('/home/.cdsrc.json', JSON.stringify(env));
-
     const app = express();
-    cds.root = '/home'
-    cds.env = cds.env.for(cds);
-    cds.requires = cds.env.requires;
+    // cds.root = '/home'
     cds.db = await cds.connect.to('db');
     await cds.deploy(csn).to(cds.db);
     await cds.serve('all', {}, env).from(csn).in(app);
@@ -32,6 +28,9 @@ export const serve = async () => {
 
     app.listen(8080)
 
+
     const response = await app.handle({url: '/odata/v4/catalog/Books'})
     console.log('response', response);
 }
+
+await serve()

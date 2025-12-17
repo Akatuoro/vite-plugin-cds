@@ -1,4 +1,9 @@
 class Path {
+
+  constructor() {
+    this.sep = '/'
+  }
+
   // Join multiple path segments into one
   join(...segments) {
     return segments

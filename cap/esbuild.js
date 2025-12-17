@@ -80,7 +80,7 @@ export function capESBuild() {
             '@sap/cds/lib/srv/factory',
             '@sap/cds/srv/app-service.js',
             '@sap/cds/lib/env/defaults',
-            '@cap-js/sqlite'
+            '@cap-js/sqlite',
           ].map(async m => {
             const resolved = await build.resolve(m, {
               resolveDir,

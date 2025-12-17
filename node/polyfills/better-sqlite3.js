@@ -5,18 +5,16 @@ import { createBetterSqlite3Like } from './better-sqlite3-wasm-compat.js';
 let _Database;
 const init = () => {
     const fn = function(...args) {
-        console.log('requesting db')
         if (!_Database) throw new Error('Database not initialized')
         return new _Database(...args);
     };
 
     fn.initialized = sqlite3InitModule({ print: console.log, printErr: console.error }).then(sqlite3 => {
-        console.log('initialized');
+        console.debug('sqlite3 initialized');
         _Database = createBetterSqlite3Like(sqlite3, { filename: ':memory:' }).Database;
         return _Database;
     }); // unable to use top-level await due to require('better-sqlite3').prototype
 
-    console.log(fn);
     return fn
 }
 
