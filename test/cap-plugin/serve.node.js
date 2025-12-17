@@ -1,6 +1,6 @@
 import cds from '@sap/cds';
 // import express from 'express';
-import express from '../../node/polyfills/express.js';
+import express from '../../node/libs/express.js';
 import env from './cds-env.json' with { type: 'json' };
 import sqlite from 'better-sqlite3';
 

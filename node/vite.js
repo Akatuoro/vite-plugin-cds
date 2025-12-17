@@ -18,8 +18,13 @@ export function nodeVite() {
   const windowBootstrap = fs.readFileSync(path.resolve(__dirname, 'shims/window-bootstrap.js'), 'utf-8');
 
   const nodeMocks = fromEntries([
-    'events', 'fs', 'fs/promises', 'path', 'os', 'async_hooks', 'util', 'express', 'stream', 'stream/consumers', 'stream/promises', 'buffer'
-  ].map( m => [m, resolve(path.join(__dirname, 'polyfills', m))] ))
+    'events', 'fs', 'fs/promises', 'path', 'os', 'async_hooks', 'util', 'stream', 'stream/consumers', 'stream/promises', 'buffer'
+  ].map( m => [m, resolve(path.join(__dirname, 'polyfills', m))] )
+    .flatMap(([k, v]) => [[k, v], ['node:' + k, v]]))
+
+  const libMocks = fromEntries([
+    'express'
+  ].map( m => [m, resolve(path.join(__dirname, 'libs', m))] ))
 
   return {
     name: 'node',
@@ -32,7 +37,7 @@ export function nodeVite() {
         resolve: {
           alias: {
             ...nodeMocks,
-            ...Object.fromEntries(Object.entries(nodeMocks).map(([k,v]) => ['node:' + k, v])),
+            ...libMocks,
           }
         },
         worker: {
@@ -54,9 +59,9 @@ export function nodeVite() {
 }
 
 export function sqlite3Vite() {
-  const nodeMocks = fromEntries([
+  const libMocks = fromEntries([
     'better-sqlite3'
-  ].map( m => [m, resolve(path.join(__dirname, 'polyfills', m))] ))
+  ].map( m => [m, resolve(path.join(__dirname, 'libs', m))] ))
 
   return {
     name: 'sqlite3',
@@ -65,7 +70,7 @@ export function sqlite3Vite() {
       return {
         resolve: {
           alias: {
-            ...nodeMocks,
+            ...libMocks,
           }
         },
       };

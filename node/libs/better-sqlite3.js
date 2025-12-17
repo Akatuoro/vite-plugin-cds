@@ -1,4 +1,4 @@
-import sqlite3InitModule from '@sqlite.org/sqlite-wasm'; // however you load it
+import sqlite3InitModule from '@sqlite.org/sqlite-wasm';
 import { createBetterSqlite3Like } from './better-sqlite3-wasm-compat.js';
 
 
