@@ -18,6 +18,7 @@ export const serve = async () => {
 
     await sqlite.initialized;
 
+    // TODO: some default configurations are loaded by checking the package.json and cds-plugin.js of npm dependencies -> provide preload
     fs.writeFileSync('/home/.cdsrc.json', JSON.stringify(env));
 
     const app = express();
