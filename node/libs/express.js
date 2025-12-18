@@ -90,7 +90,7 @@ function normalizePath(pathname = '/') {
 
 function matchPath(routePath, requestPath) {
   const params = {};
-  if (routePath === '*' || routePath === '/*') return { matched: true, params };
+  if (routePath === '*' || routePath === '/*' || routePath === '/{*splat}') return { matched: true, params };
 
   const routeSegments = normalizePath(routePath).split('/').filter(Boolean);
   const pathSegments = normalizePath(requestPath).split('/').filter(Boolean);
