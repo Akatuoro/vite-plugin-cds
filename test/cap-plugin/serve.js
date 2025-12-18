@@ -33,6 +33,10 @@ export const serve = async () => {
 
     app.listen(8080)
 
+    // cds silently ignores system errors (exits process if cds.app?.server is set, nothing otherwise)
+    cds.shutdown = (err) => console.error(err);
+
+    console.debug('app started');
     const response = await app.handle({url: '/odata/v4/catalog/Books'})
     console.log('response', response);
 }
