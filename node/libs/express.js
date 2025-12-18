@@ -34,7 +34,24 @@ class ResponseMock extends EventEmitter {
   }
 
   send(data) {
-    return this.end(data);
+    if (data === undefined) return this.end('');
+
+    const isBuffer = data instanceof Buffer;
+    const isArrayBuffer = data instanceof ArrayBuffer;
+    const isView = ArrayBuffer.isView(data);
+
+    if (data === null) {
+      return this.end('null');
+    }
+
+    if (!isBuffer && !isArrayBuffer && !isView && typeof data === 'object') {
+      if (!this.headers['content-type']) {
+        this.headers['content-type'] = 'application/json';
+      }
+      return this.end(JSON.stringify(data));
+    }
+
+    return this.end(String(data));
   }
 
   end(data) {

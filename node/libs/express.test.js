@@ -84,3 +84,16 @@ test('express.text populates missing body with empty string', async () => {
 
   assert.strictEqual(res.body, 'empty');
 });
+
+test('express.send serializes objects to json', async () => {
+  const app = express();
+
+  app.get('/json', (_req, res) => {
+    res.send({ value: [] });
+  });
+
+  const res = await app.handle({ method: 'GET', path: '/json' });
+
+  assert.strictEqual(res.body, '{"value":[]}');
+  assert.strictEqual(res.getHeader('content-type'), 'application/json');
+});
