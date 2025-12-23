@@ -51,6 +51,16 @@ class InMemoryFSPromises {
       }
     });
   }
+
+  // Retrieve file statistics
+  lstat(path) {
+    return new Promise((resolve, reject) => {
+      fs.lstat(path, (err, stats) => {
+        if (err) reject(err);
+        else resolve(stats);
+      });
+    });
+  }
 }
 
 // Export the promise-based fs

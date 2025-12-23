@@ -1,13 +1,11 @@
 {
-    "name": "cap-plugin-test",
+    "name": "cap-plugin-compile-test",
     "type": "module",
     "scripts": {
         "start": "vite"
     },
     "devDependencies": {
-        "@cap-js/sqlite": "^2",
         "@sap/cds": "^9",
-        "@sqlite.org/sqlite-wasm": "^3",
         "vite": "^7"
     },
     "dependencies": {

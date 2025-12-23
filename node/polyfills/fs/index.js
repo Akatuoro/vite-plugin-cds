@@ -1,6 +1,17 @@
-class InMemoryFS {
+export class InMemoryFS {
   constructor() {
     this.files = {};
+  }
+
+  // Create a minimal Stats-like object for stored files
+  _createStats(path) {
+    const content = this.files[path];
+    return {
+      size: typeof content === 'string' ? content.length : 0,
+      isFile: () => true,
+      isDirectory: () => false,
+      isSymbolicLink: () => false,
+    };
   }
 
   // Write a file
@@ -36,6 +47,24 @@ class InMemoryFS {
     return this.files.hasOwnProperty(path);
   }
 
+  // Retrieve file statistics
+  lstat(path, callback) {
+    if (!this.files[path]) {
+      if (callback) callback(new Error(`ENOENT: no such file or directory, lstat '${path}'`));
+      return;
+    }
+    const stats = this._createStats(path);
+    if (callback) callback(null, stats);
+  }
+
+  // Retrieve file statistics synchronously
+  lstatSync(path) {
+    if (!this.files[path]) {
+      throw new Error(`ENOENT: no such file or directory, lstat '${path}'`);
+    }
+    return this._createStats(path);
+  }
+
   // Delete a file
   unlink(path, callback) {
     if (!this.files[path]) {
@@ -66,7 +95,8 @@ class InMemoryFS {
   }
 }
 
-// Export the in-memory fs
-const fs = new InMemoryFS();
-export default fs;
+globalThis.fs ??= new InMemoryFS();
 
+// Export the in-memory fs
+const fs = globalThis.fs;
+export default fs;

@@ -20,14 +20,16 @@
         "cds-plugin.js",
         "index.js"
     ],
+    "type": "module",
     "scripts": {
-        "test": "echo \"Everything ok! (TODO: add tests)\""
+        "test": "node --test ./**/*.test.js"
     },
     "peerDependencies": {
         "@sap/cds": "^9"
     },
     "devDependencies": {
         "@sap/cds": "^9",
+        "@sqlite.org/sqlite-wasm": "^3",
         "vite": "^7"
     },
     "workspaces": [

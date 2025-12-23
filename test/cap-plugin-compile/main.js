@@ -1,6 +1,4 @@
-process.env.DEBUG = 'all'
 import cds from '@sap/cds';
-import { serve } from './serve.js'
 
 const model = 'entity Browser {key ID: Integer; name: String}';
 const csn = cds.compile(model);
@@ -25,4 +23,3 @@ worker.addEventListener('message', event => {
     appDiv.appendChild(resultPre);
 });
 
-await serve();

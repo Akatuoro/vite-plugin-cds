@@ -18,8 +18,14 @@ export function nodeVite() {
   const windowBootstrap = fs.readFileSync(path.resolve(__dirname, 'shims/window-bootstrap.js'), 'utf-8');
 
   const nodeMocks = fromEntries([
-    'events', 'fs', 'fs/promises', 'path', 'async_hooks', 'util'
-  ].map( m => [m, resolve(path.join(__dirname, 'polyfills', m))] ))
+    'events', 'fs', 'fs/promises', 'path', 'os', 'async_hooks', 'util', 'stream', 'stream/consumers', 'stream/promises', 'buffer', 'crypto', 'perf_hooks',
+  ].map( m => [m, resolve(path.join(__dirname, 'polyfills', m))] )
+    .flatMap(([k, v]) => [[k, v], ['node:' + k, v]]))
+
+  const libMocks = fromEntries([
+    'express',
+    'better-sqlite3',
+  ].map( m => [m, resolve(path.join(__dirname, 'libs', m))] ))
 
   return {
     name: 'node',
@@ -32,7 +38,7 @@ export function nodeVite() {
         resolve: {
           alias: {
             ...nodeMocks,
-            ...Object.fromEntries(Object.entries(nodeMocks).map(([k,v]) => ['node:' + k, v])),
+            ...libMocks,
           }
         },
         worker: {
@@ -41,7 +47,18 @@ export function nodeVite() {
               banner: windowBootstrap,
             }
           }
-        }
+        },
+
+        // for sqlite3-wasm
+        server: {
+          headers: {
+            'Cross-Origin-Opener-Policy': 'same-origin',
+            'Cross-Origin-Embedder-Policy': 'require-corp',
+          },
+        },
+        optimizeDeps: {
+          exclude: ['@sqlite.org/sqlite-wasm'],
+        },
       };
     },
     transform(code, id) {
