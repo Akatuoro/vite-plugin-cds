@@ -41,12 +41,13 @@ export function callbackify(func) {
  * @param {Function} superCtor - The constructor to inherit from.
  */
 export function inherits(ctor, superCtor) {
-  if (typeof superCtor !== 'function' && superCtor !== null) {
-    throw new TypeError('The super constructor must be a function or null');
+  if (typeof superCtor !== 'function' && typeof superCtor !== 'object' && superCtor !== null) {
+    throw new TypeError('The super constructor must be a function, object, or null', ctor, superCtor);
   }
   ctor.super_ = superCtor;
   if (superCtor) {
-    Object.setPrototypeOf(ctor.prototype, superCtor.prototype);
+    if (typeof superCtor === 'object') Object.setPrototypeOf(ctor.prototype, Object.getPrototypeOf(superCtor))
+    else Object.setPrototypeOf(ctor.prototype, superCtor.prototype);
   }
 }
 
@@ -57,6 +58,7 @@ export function inherits(ctor, superCtor) {
  * @returns {string} - The formatted string.
  */
 export function format(format, ...args) {
+  if (typeof format !== 'string') return format;
   let i = 0;
   return format.replace(/%[sdj%]/g, (match) => {
     if (match === '%%') return '%';
