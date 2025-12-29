@@ -103,12 +103,12 @@ import express from 'express';
 
 //======= compile a csn model =======
 const csn = cds.compile(`
-entity Books {
+entity my.Books {
   key ID: Integer;
   title: String
 }
 service CatalogService {
-  entity Books as projection on Books;
+  entity Books as projection on my.Books;
 }`);
 console.log(csn.definitions)
 
