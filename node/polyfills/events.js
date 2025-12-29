@@ -11,6 +11,6 @@ export class EventEmitter extends EventTarget {
 
     once(eventName, cb) {
         // TODO
-        this.addEventListener(eventName, cb)
+        this.addEventListener(eventName, cb, { once: true })
     }
 }
