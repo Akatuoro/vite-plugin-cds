@@ -6,7 +6,12 @@ import { insertFileDir } from './helpers.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const resolve = path => fileURLToPath(import.meta.resolve(path));
+const resolve = path => { try {
+  return fileURLToPath(import.meta.resolve(path));
+} catch (e) {
+  if (e.code === 'MODULE_NOT_FOUND') return;
+  else throw e;
+}};
 
 const ccds = path.dirname(resolve('@sap/cds'));
 const csqlite = path.dirname(resolve('@cap-js/sqlite'));
@@ -16,6 +21,7 @@ const ccoms = [ccom1, ccom2];
 const noop = path.join(__dirname, 'shims/noop.js');
 
 const isPathInside = (p, dir) => {
+  if (!dir) return false;
   const relative = path.relative(dir, p);
   return relative && !relative.startsWith('..') && !path.isAbsolute(relative);
 };
