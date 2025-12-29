@@ -3,6 +3,8 @@ import fs from 'fs/promises';
 import { fileURLToPath } from 'url';
 import { insertFileDir } from './helpers.js';
 
+import cds from '@sap/cds';
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -74,6 +76,15 @@ export function capESBuild() {
         return null;
       });
 
+      build.onResolve({ filter: /^virtual:cds-env$/ }, async args => {
+        return { path: 'cds-env', namespace: 'virtual' };
+      });
+
+      build.onLoad({ filter: /^cds-env$/, namespace: 'virtual' }, async args => {
+        const { env } = cds;
+        return { contents: JSON.stringify(env), loader: 'json' };
+      });
+
       build.onLoad({ filter: /\.[cm]?jsx?$/ }, async (args) => {
         let code = await fs.readFile(args.path, 'utf8');
 
@@ -118,7 +129,9 @@ export function capESBuild() {
 
         // Check whether we're inside the cds runtime
         if (isPathInside(args.path, ccds)) {
-          code = `require("${resolve(__dirname + '/shims/preload-modules.js')}")\n` + code;
+          code = `require("${resolve(__dirname + '/shims/preload-modules.js')}")\n` +
+            `require("${resolve(__dirname + '/shims/load-cds-env.js')}")\n` +
+            code;
 
           code = insertFileDir(code, args.path);
 

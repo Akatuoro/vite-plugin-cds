@@ -25,4 +25,7 @@ worker.addEventListener('message', event => {
     appDiv.appendChild(resultPre);
 });
 
-await serve();
+const response = await serve();
+const responsePre = document.createElement('pre');
+responsePre.textContent = `OData Response:\n\n${JSON.stringify(JSON.parse(response.body), null, 2)}`;
+appDiv.appendChild(responsePre);

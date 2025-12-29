@@ -1,7 +1,6 @@
 import cds from '@sap/cds';
 // import express from 'express';
 import express from '../../node/libs/express.js';
-import env from './cds-env.json' with { type: 'json' };
 import sqlite from 'better-sqlite3';
 
 
@@ -22,7 +21,7 @@ export const serve = async () => {
     // cds.root = '/home'
     cds.db = await cds.connect.to('db');
     await cds.deploy(csn).to(cds.db);
-    await cds.serve('all', {}, env).from(csn).in(app);
+    await cds.serve('all').from(csn).in(app);
 
     globalThis.app = app;
 

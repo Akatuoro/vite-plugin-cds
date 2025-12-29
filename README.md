@@ -1,10 +1,10 @@
 # vite-plugin-cds
 
-A [vite](https://vitejs.dev/) plugin for the [SAP Cloud Application Programming Model](https://cap.cloud.sap/).
+A [vite](https://vitejs.dev/) plugin for [@sap/cds](https://cap.cloud.sap/).
 
 - Run `vite` apps via `cds watch`
 - Import `.cds` model files in your vite app
-- Build the `cds runtime` along with your vite app (limited support)
+- Build `@sap/cds` along with your vite app (limited support)
 
 ## Usage
 
@@ -59,7 +59,7 @@ Add the `cds` plugin to your vite config.
 ```js
 // vite.config.js
 import { defineConfig } from 'vite'
-import { cds } from 'vite-plugin-cds';
+import { cds } from 'vite-plugin-cds'
 
 export default defineConfig({
   plugins: [ cds() ],
@@ -77,12 +77,16 @@ import cdsModel from './index.cds';
 
 ### Build the cds runtime with vite (experimental)
 
-The cds runtime needs Node.js built-in modules which are not available in the browser. This repo contains a plugin with very basic polyfills necessary to make the cds runtime compile in the browser. For a more complete solution, consider other polyfill libraries.
+The cds runtime needs Node.js built-in modules which are not available in the browser. This repo contains a plugin with very basic polyfills necessary to run `@sap/cds` in the browser. For a more complete solution, consider other polyfill libraries.
+
+```sh
+npm install --save-dev vite vite-plugin-cds @sap/cds @cap-js/sqlite @sqlite.org/sqlite-wasm express
+```
 
 ```js
 // vite.config.js
 import { defineConfig } from 'vite'
-import { node, cap } from 'vite-plugin-cds';
+import { node, cap } from 'vite-plugin-cds'
 
 export default defineConfig({
   plugins: [ node(), cap() ],
@@ -93,11 +97,34 @@ export default defineConfig({
 In your frontend vite app, you can now use parts of the cds runtime.
 
 ```js
-import cds from '@sap/cds';
-const csn = cds.compile('entity Books {key ID: Integer; title: String}')
+import cds from '@sap/cds'
+import sqlite from 'better-sqlite3'
+import express from 'express';
+
+//======= compile a csn model =======
+const csn = cds.compile(`
+entity Books {
+  key ID: Integer;
+  title: String
+}
+service CatalogService {
+  entity Books as projection on Books;
+}`);
 console.log(csn.definitions)
+
+//======= start a cds server =======
+await sqlite.initialized // wait for sqlite3-wasm to be ready (part of polyfill)
+
+cds.db = await cds.connect.to('db');
+await cds.deploy(csn).to(cds.db);
+
+const app = express();
+await cds.serve('all').from(csn).in(app);
+
+const response = await app.handle({url: '/odata/v4/catalog/Books'}) // part of polyfill
+console.log('response', response);
 ```
 
 > [Example App](./test/cap-plugin)
 
-Due to Node.js dependencies, functionality is very limited.
+Due to Node.js dependencies, functionality is limited.
