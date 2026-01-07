@@ -3,5 +3,8 @@ import { cap, node } from '../../';
 
 export default defineConfig({
   plugins: [ node(), cap() ],
+  build: {
+    minify: false
+  },
   root: './',
 })

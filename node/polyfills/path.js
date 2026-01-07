@@ -74,4 +74,4 @@ class Path {
 
 // Export the in-memory path module
 const path = new Path();
-module.exports = path;
+export default path;
