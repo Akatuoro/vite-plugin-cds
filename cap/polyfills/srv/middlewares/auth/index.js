@@ -1,6 +1,7 @@
-const cds = require('@sap/cds');
+import { requires } from '@sap/cds';
+import basic from '@sap/cds/lib/srv/middlewares/auth/basic-auth.js';
 
-module.exports = function(o) {
-    const options = { ...cds.requires.auth, ...o }
-    return require('@sap/cds/lib/srv/middlewares/auth/basic-auth.js')(options)
+export default function(o) {
+    const options = { ...requires.auth, ...o }
+    return basic(options)
 }

@@ -1,24 +1,18 @@
 import path from 'path';
 import fs from 'fs/promises';
-import { fileURLToPath } from 'url';
-import { insertFileDir } from './helpers.js';
+import { fileURLToPath, pathToFileURL } from 'url';
+import { insertFileDir, resolve } from './helpers.js';
 
 import cds from '@sap/cds';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const resolve = path => { try {
-  return fileURLToPath(import.meta.resolve(path));
-} catch (e) {
-  if (e.code === 'MODULE_NOT_FOUND') return;
-  else throw e;
-}};
 
 const ccds = path.dirname(resolve('@sap/cds'));
 const csqlite = path.dirname(resolve('@cap-js/sqlite'));
 const ccom1 = path.dirname(resolve('@sap/cds-compiler'));
-const ccom2 = path.dirname(resolve('@sap/cds-compiler', { paths: [ccds] }));
+const ccom2 = path.dirname(resolve('@sap/cds-compiler', ccds));
 const ccoms = [ccom1, ccom2];
 const noop = path.join(__dirname, 'shims/noop.js');
 

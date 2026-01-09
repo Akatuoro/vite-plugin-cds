@@ -2,11 +2,11 @@ import { defineConfig } from 'vite'
 // import resolve from '@rollup/plugin-node-resolve';
 // import commonjs from '@rollup/plugin-commonjs';
 import { cap, node } from '../../';
+
 import path from 'path';
 import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
 
 const dynamicRequireRoot = '../../';
 
@@ -14,12 +14,14 @@ const resolveDynReqTarget = (rel) => {
   let root = dynamicRequireRoot;
   if (!dynamicRequireRoot.endsWith('/')) root += '/';
   const relFromRoot = path.relative(dynamicRequireRoot, rel);
+  console.log(dynamicRequireRoot)
 
   return dynamicRequireRoot + relFromRoot;
 }
 
 export default defineConfig({
-  plugins: [ node(), cap() ],
+
+  // plugins: [node(), cap()],
   build: {
     minify: false,
     // commonjsOptions: {
@@ -36,18 +38,11 @@ export default defineConfig({
     // },
     commonjsOptions: {
       dynamicRequireTargets: [
-        '../../node_modules/@sap/cds/lib/srv/protocols/odata-v4',
-        '../../node_modules/@sap/cds/lib/srv/factory',
-        '../../node_modules/@sap/cds/srv/app-service.js',
-        '../../node_modules/@sap/cds/lib/env/defaults',
-        '../../node_modules/@sap/cds/lib/*.js',
-        '../../node_modules/@cap-js/sqlite',
-        'lib.js'
+        './lib.js',
+        './../lib.js',
       ].map(resolveDynReqTarget),
       dynamicRequireRoot,
-      ignoreDynamicRequires: true,
-      requireReturnsDefault: "preferred",
-      include: [/node_modules/, /cap/, /node/, '*.js']
+      include: ['*.js', 'dynamic-require/*.js', /test/, /dynamic-require/]
       // ignoreDynamicRequires: true,
       // requireReturnsDefault: "auto",
       // strictRequires: "auto",
@@ -62,15 +57,6 @@ export default defineConfig({
         // sourcemap: true,
       },
       preserveEntrySignatures: true,
-
-      // commonjsOptions: {
-      //   include: /node_modules/,
-      //   requireReturnsDefault: true,
-      //   transformMixedEsModules: true,
-      //   esmExternals: true,
-      //   defaultIsModuleExports: true,
-      // },
-
     }
   },
   root: './',
