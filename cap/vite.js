@@ -10,14 +10,8 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const noop = path.join(__dirname, 'shims/noop.js');
-const auth = path.join(__dirname, 'polyfills/srv/middlewares/auth/index.js');
-const virtualNoop = '\0cap:noop';
 
 const ccds = path.dirname(resolve('@sap/cds'));
-const csqlite = path.dirname(resolve('@cap-js/sqlite'));
-const ccom1 = path.dirname(resolve('@sap/cds-compiler'));
-const ccom2 = path.dirname(resolve('@sap/cds-compiler', ccds));
-const ccoms = [ccom1, ccom2];
 
 const isPathInside = (p, dir) => {
   if (!dir) return false;
@@ -46,12 +40,8 @@ export function capVite() {
         return { code: `module.exports = require ('@cap-js/cds-test')` };
       }
 
-      // if (id === path.join(__dirname, 'shims/preload-modules.js')) {
-      //   return preloadModules(code, id);
-      // }
 
       if (isPathInside(id, ccds)) {
-        // console.log(id, code)
         code = `require("${resolve(__dirname + '/shims/preload-modules.js')}")\n` +
           `require("${resolve(__dirname + '/shims/load-cds-env.js')}")\n` +
           code;
@@ -60,29 +50,8 @@ export function capVite() {
 
         // Fix cjs / esm interop
         code = code.replace("Object.assign (exports,require('fs'))", "require('fs').default ?? require('fs')");
-        code = code.replace("require('path')", "require('path').default ?? require('path')");
-        code = code.replace("require('os')", "(require('os').default ?? require('os'))");
-        code = code.replace("require('express')", "require('express').default ?? require('express')");
-
-        // code.match(/const (\w+) = exports = module.exports/)
-        // code = code.replace(/const (\w+) = exports = module.exports/, )
 
         return { code, map: null };
-      }
-
-      // Check whether we're inside cds libx
-      if (isPathInside(id, path.join(path.dirname(ccds), 'libx'))) {
-        code = code.replace("require('express')", "require('express').default ?? require('express')");
-
-        return { code };
-      }
-
-      // Check whether we're inside the cds sqlite driver
-      if (isPathInside(id, csqlite)) {
-        // Fix cjs / esm interop
-        code = code.replace("require('better-sqlite3')", "require('better-sqlite3').default ?? require('better-sqlite3')");
-
-        return { code };
       }
     },
 
