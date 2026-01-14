@@ -5,14 +5,12 @@
         "start": "vite"
     },
     "devDependencies": {
+        "@cap-js/sqlite": "^2",
         "@rollup/plugin-commonjs": "^29.0.0",
         "@rollup/plugin-node-resolve": "^16.0.3",
-        "@sqlite.org/sqlite-wasm": "^3",
-        "vite": "^7"
-    },
-    "dependencies": {
-        "@cap-js/sqlite": "^2",
         "@sap/cds": "^9",
-        "express": "^4.22.1"
+        "@sqlite.org/sqlite-wasm": "^3",
+        "express": "^4.22.1",
+        "vite": "^7"
     }
 }
