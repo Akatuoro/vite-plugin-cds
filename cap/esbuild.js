@@ -112,12 +112,14 @@ export function capESBuild() {
 
         // Simple check whether we're in a cds-compiler
         if (ccoms.some(c => isPathInside(args.path, c))) {
-          if (!code.includes('lazyload(')) return; // fast path
+          if (code.includes('lazyload(')) {
+            // Replace lazyload('pkg') with require('pkg') for string literals only
+            code = code
+              .replace(/\blazyload\s*\(\s*(['"`])([^'"`]+)\1\s*\)/g, 'require($1$2$1)');
+          }
 
-          // Replace lazyload('pkg') with require('pkg') for string literals only
-          code = code
-            .replace(/\blazyload\s*\(\s*(['"`])([^'"`]+)\1\s*\)/g, 'require($1$2$1)');
-
+          code = code.replace("require('path')", "(require('path').default ?? require('path'))");
+          code = code.replace("require('os')", "(require('os').default ?? require('os'))");
           return { contents: code, loader: 'js' };
         }
 
@@ -132,6 +134,8 @@ export function capESBuild() {
           // Fix cjs / esm interop
           code = code.replace("Object.assign (exports,require('fs'))", "require('fs').default ?? require('fs')");
           code = code.replace("require('express')", "require('express').default ?? require('express')");
+        code = code.replace("require('path')", "(require('path').default ?? require('path'))");
+        code = code.replace("require('os')", "(require('os').default ?? require('os'))");
 
           return { contents: code, loader: 'js' };
         }
