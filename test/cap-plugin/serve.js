@@ -1,4 +1,4 @@
-import * as cds from '@sap/cds';
+import cds from '@sap/cds';
 import express from 'express';
 import sqlite from 'better-sqlite3';
 
