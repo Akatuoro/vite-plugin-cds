@@ -20,6 +20,15 @@ const isPathInside = (p, dir) => {
 };
 
 
+const dynamicRequireRoot = '../../';
+
+const resolveDynReqTarget = (rel) => {
+  let root = dynamicRequireRoot;
+  if (!dynamicRequireRoot.endsWith('/')) root += '/';
+  const relFromRoot = path.relative(dynamicRequireRoot, rel);
+
+  return dynamicRequireRoot + relFromRoot;
+}
 
 export function capVite() {
   return {
@@ -92,6 +101,24 @@ export function capVite() {
           esbuildOptions: {
             plugins: [capESBuild()],
             keepNames: true,
+          },
+        },
+        build: {
+
+          commonjsOptions: {
+            dynamicRequireTargets: [
+              '../../node_modules/@sap/cds/lib/srv/protocols/odata-v4',
+              '../../node_modules/@sap/cds/lib/srv/factory',
+              '../../node_modules/@sap/cds/srv/app-service.js',
+              '../../node_modules/@sap/cds/lib/env/defaults',
+              '../../node_modules/@sap/cds/lib/*.js',
+              '../../node_modules/@cap-js/sqlite',
+              'lib.js'
+            ].map(resolveDynReqTarget),
+            dynamicRequireRoot,
+            ignoreDynamicRequires: true,
+            requireReturnsDefault: "preferred",
+            include: [/node_modules/, /cap/, /node/, '*.js']
           },
         },
         resolve: {
