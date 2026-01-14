@@ -2,9 +2,9 @@
 
 A [vite](https://vitejs.dev/) plugin for [@sap/cds](https://cap.cloud.sap/).
 
-- Run `vite` apps via `cds watch`
-- Import `.cds` model files in your vite app
-- Build `@sap/cds` along with your vite app to run `cds` in the browser (limited support)
+- [Run](#run-vite-apps-via-cds-watch) `vite` apps via `cds watch`
+- [Import](#import-cds-model-files-in-your-vite-app) `.cds` model files in your vite app
+- `@sap/cds` [in the browser](#build-the-cds-runtime-with-vite-experimental)
 
 ## Usage
 
