@@ -34,4 +34,6 @@
     } 
     return resolved;
   }
+
+  return function(cb) { return cb }
 })()

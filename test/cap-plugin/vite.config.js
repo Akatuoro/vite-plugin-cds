@@ -1,7 +1,7 @@
 import { defineConfig } from 'vite'
 import { cap, node } from '../../';
 
-export default defineConfig({
+const config = defineConfig({
   plugins: [ node(), cap() ],
   build: {
     minify: false,
@@ -13,5 +13,10 @@ export default defineConfig({
       preserveEntrySignatures: true,
     }
   },
+  worker: {
+    plugins: () => config.plugins
+  },
   root: './',
 })
+
+export default config;
