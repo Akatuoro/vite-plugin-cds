@@ -1,6 +1,8 @@
-const cds = require('@sap/cds');
+// needs to be cjs to avoid ESM interop issues at runtime
+const { requires } = require('@sap/cds');
+const basic = require('@sap/cds/lib/srv/middlewares/auth/basic-auth.js');
 
 module.exports = function(o) {
-    const options = { ...cds.requires.auth, ...o }
-    return require('@sap/cds/lib/srv/middlewares/auth/basic-auth.js')(options)
+    const options = { ...requires.auth, ...o }
+    return basic(options)
 }

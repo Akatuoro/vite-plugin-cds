@@ -207,6 +207,7 @@ class MiniExpress {
       await out(err);
 
       if (err && !response.finished) {
+        console.error(err)
         response.status(err.status || err.statusCode || 500);
         const body = err.body || {
           error: {

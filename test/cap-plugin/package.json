@@ -8,9 +8,7 @@
         "@cap-js/sqlite": "^2",
         "@sap/cds": "^9",
         "@sqlite.org/sqlite-wasm": "^3",
+        "express": "^4.22.1",
         "vite": "^7"
-    },
-    "dependencies": {
-        "express": "^4.22.1"
     }
 }

@@ -41,6 +41,13 @@ export function nodeVite() {
             ...libMocks,
           }
         },
+        build: {
+          rollupOptions: {
+            output: {
+              banner: windowBootstrap,
+            }
+          }
+        },
         worker: {
           rollupOptions: {
             output: {

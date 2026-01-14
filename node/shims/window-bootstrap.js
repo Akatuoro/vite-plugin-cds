@@ -27,11 +27,13 @@
   g.require.resolve = (path) => {
     const resolved = g.modules?.resolve(path) ?? path;
     console.debug('require.resolve', resolved, path);
-    if (!modules?.[resolved] && !g.fs?.existsSync(path)) {
+    if (!g.modules?.[resolved] && !g.fs?.existsSync(path)) {
       const e = new Error(`Path ${path} not found`);
       e.code = 'MODULE_NOT_FOUND';
       throw e;
     } 
     return resolved;
   }
+
+  return function(cb) { return cb }
 })()

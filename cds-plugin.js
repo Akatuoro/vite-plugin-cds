@@ -75,7 +75,7 @@ async function startAll(router) {
     router.use(server.config.base, server.middlewares);
   }
 
-  console.log('🚀 All Vite servers are running!');
+  console.info('🚀 All Vite servers are running!');
 }
 
 cds.on('bootstrap', app => cds.on('served', () => startAll(app)));

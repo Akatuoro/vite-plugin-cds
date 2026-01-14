@@ -28,6 +28,6 @@ export const serve = async () => {
 
     console.debug('app started');
     const response = await app.handle({url: '/odata/v4/catalog/Books'})
-    console.log('response', response);
+    console.debug('response', response);
     return response;
 }

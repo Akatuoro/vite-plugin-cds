@@ -1,24 +1,18 @@
 import path from 'path';
 import fs from 'fs/promises';
-import { fileURLToPath } from 'url';
-import { insertFileDir } from './helpers.js';
+import { fileURLToPath, pathToFileURL } from 'url';
+import { insertFileDir, preloadModules, resolve } from './helpers.js';
 
 import cds from '@sap/cds';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const resolve = path => { try {
-  return fileURLToPath(import.meta.resolve(path));
-} catch (e) {
-  if (e.code === 'MODULE_NOT_FOUND') return;
-  else throw e;
-}};
 
 const ccds = path.dirname(resolve('@sap/cds'));
 const csqlite = path.dirname(resolve('@cap-js/sqlite'));
 const ccom1 = path.dirname(resolve('@sap/cds-compiler'));
-const ccom2 = path.dirname(resolve('@sap/cds-compiler', { paths: [ccds] }));
+const ccom2 = path.dirname(resolve('@sap/cds-compiler', ccds));
 const ccoms = [ccom1, ccom2];
 const noop = path.join(__dirname, 'shims/noop.js');
 
@@ -90,40 +84,20 @@ export function capESBuild() {
 
         // fill in preloaded modules
         if (args.path == path.join(__dirname, 'shims/preload-modules.js')) {
-          const resolveDir = path.dirname(args.path);
-          const importer = args.path;
-          const preloadModules = (await Promise.all([
-            '@sap/cds/lib/srv/protocols/odata-v4',
-            '@sap/cds/lib/srv/factory',
-            '@sap/cds/srv/app-service.js',
-            '@sap/cds/lib/env/defaults',
-            '@cap-js/sqlite',
-          ].map(async m => {
-            const resolved = await build.resolve(m, {
-              resolveDir,
-              importer,
-              kind: 'require-call',
-            });
-            const rel = path.relative(resolveDir, resolved.path);
-            return [
-              { s: rel, t: rel },
-              { s: m, t: rel },
-            ];
-          }))).flat();
-          preloadModules.push({s: './defaults', t: preloadModules.find(({s}) => s === '@sap/cds/lib/env/defaults').t });
-
-          code = code.replace('// <placeholder>', preloadModules.map(({s, t}) => `'${s}': () => require('${t}')`).join(',\n'));
+          code = preloadModules(code, args.path).code;
           return { contents: code, loader: 'js' };
         };
 
         // Simple check whether we're in a cds-compiler
         if (ccoms.some(c => isPathInside(args.path, c))) {
-          if (!code.includes('lazyload(')) return; // fast path
+          if (code.includes('lazyload(')) {
+            // Replace lazyload('pkg') with require('pkg') for string literals only
+            code = code
+              .replace(/\blazyload\s*\(\s*(['"`])([^'"`]+)\1\s*\)/g, 'require($1$2$1)');
+          }
 
-          // Replace lazyload('pkg') with require('pkg') for string literals only
-          code = code
-            .replace(/\blazyload\s*\(\s*(['"`])([^'"`]+)\1\s*\)/g, 'require($1$2$1)');
-
+          code = code.replace("require('path')", "(require('path').default ?? require('path'))");
+          code = code.replace("require('os')", "(require('os').default ?? require('os'))");
           return { contents: code, loader: 'js' };
         }
 
@@ -138,6 +112,8 @@ export function capESBuild() {
           // Fix cjs / esm interop
           code = code.replace("Object.assign (exports,require('fs'))", "require('fs').default ?? require('fs')");
           code = code.replace("require('express')", "require('express').default ?? require('express')");
+          code = code.replace("require('path')", "(require('path').default ?? require('path'))");
+          code = code.replace("require('os')", "(require('os').default ?? require('os'))");
 
           return { contents: code, loader: 'js' };
         }
@@ -178,7 +154,6 @@ export function capESBuild() {
 
         if ( resolved.path === path.join(ccds, 'srv/middlewares/auth/index.js')) {
           return { path: path.join(__dirname, 'polyfills/srv/middlewares/auth/index.js') };
-          // return { path: path.join(ccds, 'srv/middlewares/auth/basic-auth.js') };
         }
 
         return null;

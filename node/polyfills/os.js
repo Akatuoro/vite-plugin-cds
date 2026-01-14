@@ -6,4 +6,4 @@ class OS {
 
 // Export the in-memory path module
 const os = new OS();
-module.exports = os;
+export default os;

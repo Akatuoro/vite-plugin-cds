@@ -1,4 +1,5 @@
 import path from "node:path";
+import { fileURLToPath, pathToFileURL } from 'url';
 
 
 export const insertFileDir = (code, id) => {
@@ -42,4 +43,38 @@ export const insertFileDir = (code, id) => {
     );
 
     return transformed;
+}
+
+export const resolve = (path, parent) => { try {
+  parent &&= pathToFileURL(parent)
+  return fileURLToPath(import.meta.resolve(path, parent));
+} catch (e) {
+  if (e.code === 'MODULE_NOT_FOUND') return;
+  else throw e;
+}};
+
+
+export const preloadModules = (code, id) => {
+    const resolveDir = path.dirname(id);
+    const imports = [];
+    const preloadModules = [
+        '@sap/cds/lib/srv/protocols/odata-v4',
+        '@sap/cds/lib/srv/factory',
+        '@sap/cds/srv/app-service.js',
+        '@sap/cds/lib/env/defaults',
+        '@cap-js/sqlite',
+    ].map((m, i) => {
+    const resolved = resolve(m, id);
+    const t = path.relative(resolveDir, resolved);
+    imports.push({ t });
+    return [
+        { s: t, t },
+        { s: m, t },
+    ];
+    }).flat();
+    const defM = preloadModules.find(({s}) => s === '@sap/cds/lib/env/defaults');
+    if (defM) { preloadModules.push({...defM, s: './defaults'}); }
+
+    code = code.replace('// <placeholder>', preloadModules.map(({s, t}) => `'${s}': () => require('${t}')`).join(',\n'));
+    return { code, map: null };
 }
