@@ -36,6 +36,12 @@ export function capVite() {
     enforce: 'pre',
 
     async transform(code, id) {
+      if (id.includes('/@sap/cds/lib/index.js')) {
+        code = code.replace(
+          /get test\(\) \{ return super\.test = require\('.*?cds-test\.js'\) \}/,
+          'get test() { return super.test = {} }',
+        );
+      }
       if (id.includes('/@sap/cds-compiler/')) {
         if (code.includes('lazyload(')) {
           // Replace lazyload('pkg') with require('pkg') for string literals only
@@ -67,6 +73,16 @@ export function capVite() {
 
     resolveId(id, importer) {
       if (id === 'virtual:cds-env') return id;
+      if (id.includes('cds-test')) {
+        if (/cds-test(\.js)?$/.test(id)) return noop;
+        const resolved = resolve(id, importer);
+        if (
+          resolved === path.join(ccds, 'lib/test/cds-test.js') ||
+          resolved === path.join(ccds, 'lib/test/cds-test')
+        ) {
+          return noop;
+        }
+      }
       if (id.includes('auth')) {
         const resolved = resolve(id, importer);
         if ( resolved === path.join(ccds, 'srv/middlewares/auth/index.js') ||
@@ -86,6 +102,9 @@ export function capVite() {
         process.env.NODE_ENV = nodeEnv;
         return 'export default ' + JSON.stringify(env);
       };
+      if (id.includes('cds-test') && /cds-test(\.js)?$/.test(id)) {
+        return 'export default {}';
+      }
 
       if (id === path.join(__dirname, 'shims/preload-modules.js')) {
         const code = fs.readFileSync(id, 'utf8');
@@ -123,6 +142,7 @@ export function capVite() {
         },
         resolve: {
           alias: [
+            { find: /^.*cds-test(\.js)?$/, replacement: noop },
             { find: '@cap-js/cds-test', replacement: noop },
             { find: 'winston', replacement: noop },
             { find: 'sqlite3', replacement: noop },
