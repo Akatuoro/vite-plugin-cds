@@ -132,12 +132,19 @@ export function capVite() {
               '../../node_modules/@sap/cds/lib/env/defaults',
               '../../node_modules/@sap/cds/lib/*.js',
               '../../node_modules/@cap-js/sqlite',
-              'lib.js'
             ].map(resolveDynReqTarget),
             dynamicRequireRoot,
             ignoreDynamicRequires: true,
             requireReturnsDefault: "preferred",
             include: [/node_modules/, /cap/, /node/, '*.js']
+          },
+          // necessary because cap coding relies on reflection:
+          minify: false,
+          rollupOptions: {
+            output: {
+              preserveModules: true,
+            },
+            preserveEntrySignatures: true,
           },
         },
         resolve: {

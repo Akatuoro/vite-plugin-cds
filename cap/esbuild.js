@@ -1,7 +1,7 @@
 import path from 'path';
 import fs from 'fs/promises';
 import { fileURLToPath, pathToFileURL } from 'url';
-import { insertFileDir, resolve } from './helpers.js';
+import { insertFileDir, preloadModules, resolve } from './helpers.js';
 
 import cds from '@sap/cds';
 
@@ -84,29 +84,7 @@ export function capESBuild() {
 
         // fill in preloaded modules
         if (args.path == path.join(__dirname, 'shims/preload-modules.js')) {
-          const resolveDir = path.dirname(args.path);
-          const importer = args.path;
-          const preloadModules = (await Promise.all([
-            '@sap/cds/lib/srv/protocols/odata-v4',
-            '@sap/cds/lib/srv/factory',
-            '@sap/cds/srv/app-service.js',
-            '@sap/cds/lib/env/defaults',
-            '@cap-js/sqlite',
-          ].map(async m => {
-            const resolved = await build.resolve(m, {
-              resolveDir,
-              importer,
-              kind: 'require-call',
-            });
-            const rel = path.relative(resolveDir, resolved.path);
-            return [
-              { s: rel, t: rel },
-              { s: m, t: rel },
-            ];
-          }))).flat();
-          preloadModules.push({s: './defaults', t: preloadModules.find(({s}) => s === '@sap/cds/lib/env/defaults').t });
-
-          code = code.replace('// <placeholder>', preloadModules.map(({s, t}) => `'${s}': () => require('${t}')`).join(',\n'));
+          code = preloadModules(code, args.path).code;
           return { contents: code, loader: 'js' };
         };
 
@@ -134,8 +112,8 @@ export function capESBuild() {
           // Fix cjs / esm interop
           code = code.replace("Object.assign (exports,require('fs'))", "require('fs').default ?? require('fs')");
           code = code.replace("require('express')", "require('express').default ?? require('express')");
-        code = code.replace("require('path')", "(require('path').default ?? require('path'))");
-        code = code.replace("require('os')", "(require('os').default ?? require('os'))");
+          code = code.replace("require('path')", "(require('path').default ?? require('path'))");
+          code = code.replace("require('os')", "(require('os').default ?? require('os'))");
 
           return { contents: code, loader: 'js' };
         }
@@ -176,7 +154,6 @@ export function capESBuild() {
 
         if ( resolved.path === path.join(ccds, 'srv/middlewares/auth/index.js')) {
           return { path: path.join(__dirname, 'polyfills/srv/middlewares/auth/index.js') };
-          // return { path: path.join(ccds, 'srv/middlewares/auth/basic-auth.js') };
         }
 
         return null;

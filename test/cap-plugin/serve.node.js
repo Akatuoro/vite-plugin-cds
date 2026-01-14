@@ -29,7 +29,7 @@ export const serve = async () => {
 
 
     const response = await app.handle({url: '/odata/v4/catalog/Books'})
-    console.log('response', response);
+    console.debug('response', response);
 }
 
 await serve()

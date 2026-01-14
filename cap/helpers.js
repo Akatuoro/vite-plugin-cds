@@ -66,19 +66,15 @@ export const preloadModules = (code, id) => {
     ].map((m, i) => {
     const resolved = resolve(m, id);
     const t = path.relative(resolveDir, resolved);
-    const n = `m${i}`;
-    imports.push({ n, t });
+    imports.push({ t });
     return [
-        { n, s: t, t },
-        { n, s: m, t },
+        { s: t, t },
+        { s: m, t },
     ];
     }).flat();
     const defM = preloadModules.find(({s}) => s === '@sap/cds/lib/env/defaults');
     if (defM) { preloadModules.push({...defM, s: './defaults'}); }
-    // preloadModules.push({s: './defaults', t: preloadModules.find(({s}) => s === '@sap/cds/lib/env/defaults')?.t });
 
-    // code = imports.map(({n, t}) => `import ${n} from '${t}'`).join('\n') + code;
-    code = code.replace('// <placeholder>', preloadModules.map(({n, s, t}) => `'${s}': () => require('${t}')`).join(',\n'));
-    console.log(code)
+    code = code.replace('// <placeholder>', preloadModules.map(({s, t}) => `'${s}': () => require('${t}')`).join(',\n'));
     return { code, map: null };
 }
