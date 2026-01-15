@@ -31,6 +31,24 @@ export class Readable extends EventedStream {
     this.destroyed = false;
   }
 
+  static from(iterable, options = {}) {
+    const readable = new Readable(options);
+
+    (async () => {
+      try {
+        for await (const chunk of iterable ?? []) {
+          readable.push(chunk);
+        }
+        readable.push(null);
+      } catch (error) {
+        readable.emit('error', error);
+        readable.push(null);
+      }
+    })();
+
+    return readable;
+  }
+
   read() {
     if (this._buffer.length === 0 && typeof this._read === 'function') {
       this._read();
