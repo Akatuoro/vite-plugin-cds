@@ -1,6 +1,3 @@
-export const inspect = {
-  custom: Symbol('inspect.custom'),
-};
 
 /**
  * Converts a callback-based function to a Promise-based one.
@@ -34,6 +31,19 @@ export function callbackify(func) {
       .catch((err) => callback(err));
   };
 }
+
+export function inspect(value) {
+  if (value && typeof value === 'object') {
+    try {
+      return JSON.stringify(value);
+    } catch {
+      return String(value);
+    }
+  }
+  return String(value);
+}
+
+inspect.custom = Symbol('inspect.custom');
 
 /**
  * Inherits the prototype methods from one constructor into another.

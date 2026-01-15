@@ -26,6 +26,11 @@ export const serve = async () => {
     // cds silently ignores system errors (exits process if cds.app?.server is set, nothing otherwise)
     cds.shutdown = (err) => console.error(err);
 
+    const { INSERT } = cds.ql;
+    const { CatalogService } = cds.services;
+    const { Books } = CatalogService.entities;
+    await INSERT.into(Books).entries({ ID: 1, title: 'LOTR' });
+
     console.debug('app started');
     const response = await app.handle({url: '/odata/v4/catalog/Books'})
     console.debug('response', response);
