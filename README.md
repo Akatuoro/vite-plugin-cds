@@ -77,6 +77,9 @@ import cdsModel from './index.cds';
 
 ### Build the cds runtime with vite (experimental)
 
+<img width="2672" height="1522" alt="On the left: Page with title 'CDS Plugin Test', a compile result, an OData response and a compile result from a worker. On the right: DevTools Console calling cds.compile, await INSERT.into and await cds.ql" src="https://github.com/user-attachments/assets/e037669f-3814-437b-b5b0-c1ff3cb0ab04" />
+
+
 The cds runtime needs Node.js built-in modules which are not available in the browser. This repo contains a plugin with very basic polyfills necessary to run `@sap/cds` in the browser. For a more complete solution, consider other polyfill libraries.
 
 ```sh
