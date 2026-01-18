@@ -122,6 +122,10 @@ export function capVite() {
             keepNames: true,
           },
         },
+        esbuild: {
+          // necessary because cap coding relies on reflection:
+          keepNames: true,
+        },
         build: {
 
           commonjsOptions: {
@@ -139,13 +143,7 @@ export function capVite() {
             include: [/node_modules/, /cap/, /node/, '*.js']
           },
           // necessary because cap coding relies on reflection:
-          minify: false,
-          rollupOptions: {
-            output: {
-              preserveModules: true,
-            },
-            preserveEntrySignatures: true,
-          },
+          minify: 'esbuild',
         },
         resolve: {
           alias: [
