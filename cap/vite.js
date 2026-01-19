@@ -42,6 +42,10 @@ export function capVite() {
           'get test() { return super.test = {} }',
         );
       }
+      if (id.includes('lib/i18n/index.js')) {
+        code = code.replaceAll('super', 'this');
+        return { code, map: null };
+      }
       if (id.includes('/@sap/cds-compiler/')) {
         if (code.includes('lazyload(')) {
           // Replace lazyload('pkg') with require('pkg') for string literals only
@@ -143,7 +147,7 @@ export function capVite() {
             include: [/node_modules/, /cap/, /node/, '*.js']
           },
           // necessary because cap coding relies on reflection:
-          minify: 'esbuild',
+          minify: false,
         },
         resolve: {
           alias: [
