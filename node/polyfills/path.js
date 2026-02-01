@@ -58,6 +58,36 @@ class Path {
     return this.resolve(path);
   }
 
+  // Get the relative path from one path to another
+  relative(from, to) {
+    const fromPath = this.resolve(from);
+    const toPath = this.resolve(to);
+
+    if (fromPath === toPath) {
+      return '';
+    }
+
+    const fromParts = fromPath.split('/').filter(Boolean);
+    const toParts = toPath.split('/').filter(Boolean);
+    const maxLength = Math.min(fromParts.length, toParts.length);
+    let commonIndex = 0;
+
+    while (commonIndex < maxLength && fromParts[commonIndex] === toParts[commonIndex]) {
+      commonIndex += 1;
+    }
+
+    const upLevels = fromParts.length - commonIndex;
+    const relativeParts = [];
+
+    for (let i = 0; i < upLevels; i += 1) {
+      relativeParts.push('..');
+    }
+
+    relativeParts.push(...toParts.slice(commonIndex));
+
+    return relativeParts.join('/');
+  }
+
   // Parse a path into { root, dir, base, ext, name }
   parse(path) {
     const root = path.startsWith('/') ? '/' : '';
