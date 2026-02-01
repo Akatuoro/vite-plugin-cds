@@ -1,11 +1,8 @@
 class Path {
-
-  constructor() {
-    this.sep = '/'
-  }
+  static sep = '/'
 
   // Join multiple path segments into one
-  join(...segments) {
+  static join(...segments) {
     return segments
       .filter(Boolean) // Remove empty segments
       .join('/')
@@ -13,14 +10,14 @@ class Path {
   }
 
   // Get the directory name of a path
-  dirname(path) {
+  static dirname(path) {
     const parts = path.split('/').filter(Boolean);
     parts.pop(); // Remove the last part (file or directory)
     return '/' + parts.join('/');
   }
 
   // Get the base name of a path
-  basename(path, ext) {
+  static basename(path, ext) {
     const base = path.split('/').filter(Boolean).pop() || '';
     if (ext && base.endsWith(ext)) {
       return base.slice(0, -ext.length);
@@ -29,14 +26,14 @@ class Path {
   }
 
   // Get the file extension of a path
-  extname(path) {
-    const base = this.basename(path);
+  static extname(path) {
+    const base = Path.basename(path);
     const dotIndex = base.lastIndexOf('.');
     return dotIndex > 0 ? base.slice(dotIndex) : '';
   }
 
   // Resolve a sequence of paths into an absolute path
-  resolve(...segments) {
+  static resolve(...segments) {
     let resolvedPath = [];
     for (const segment of segments) {
       if (segment.startsWith('/')) {
@@ -54,14 +51,15 @@ class Path {
   }
 
   // Normalize a path (remove redundant slashes and resolve `.` and `..`)
-  normalize(path) {
-    return this.resolve(path);
+  static normalize(path) {
+    return Path.resolve(path);
   }
 
   // Get the relative path from one path to another
-  relative(from, to) {
-    const fromPath = this.resolve(from);
-    const toPath = this.resolve(to);
+  static relative(from, to) {
+    const fromPath = Path.resolve(from);
+    const toPath = Path.resolve(to);
+    console.log(`relative from ${from} to ${to}`)
 
     if (fromPath === toPath) {
       return '';
@@ -89,12 +87,12 @@ class Path {
   }
 
   // Parse a path into { root, dir, base, ext, name }
-  parse(path) {
+  static parse(path) {
     const root = path.startsWith('/') ? '/' : '';
     const parts = path.split('/').filter(Boolean);
     const base = parts.pop() || '';
     const dir = root + parts.join('/');
-    const ext = this.extname(base);
+    const ext = Path.extname(base);
     const name = ext ? base.slice(0, -ext.length) : base;
 
     return { root, dir, base, ext, name };
@@ -102,6 +100,4 @@ class Path {
 
 }
 
-// Export the in-memory path module
-const path = new Path();
-export default path;
+export default Path;

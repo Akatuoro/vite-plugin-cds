@@ -14,11 +14,18 @@ export const serve = async () => {
     }`;
     const csn = cds.compile(model);
 
+    const csvs = {
+        'CatalogService-Books.csv': `
+            ID,title
+            2,Hitchhiker
+        `
+    }
+
     await sqlite.initialized;
 
     const app = express();
     cds.db = await cds.connect.to('db');
-    await cds.deploy(csn).to(cds.db);
+    await cds.deploy(csn, null, csvs).to(cds.db);
     await cds.serve('all').from(csn).in(app);
 
     globalThis.app = app;
