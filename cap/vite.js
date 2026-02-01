@@ -20,12 +20,13 @@ const isPathInside = (p, dir) => {
 };
 
 
-const dynamicRequireRoot = '../../';
+const dynamicRequireRoot = path.relative(process.cwd(), path.join(ccds, '../../../../'));
 
-const resolveDynReqTarget = (rel) => {
+const resolveDynReqTarget = (p) => {
+  const resolved = resolve(p);
   let root = dynamicRequireRoot;
   if (!dynamicRequireRoot.endsWith('/')) root += '/';
-  const relFromRoot = path.relative(dynamicRequireRoot, rel);
+  const relFromRoot = path.relative(dynamicRequireRoot, resolved);
 
   return dynamicRequireRoot + relFromRoot;
 }
@@ -134,12 +135,12 @@ export function capVite() {
 
           commonjsOptions: {
             dynamicRequireTargets: [
-              '../../node_modules/@sap/cds/lib/srv/protocols/odata-v4',
-              '../../node_modules/@sap/cds/lib/srv/factory',
-              '../../node_modules/@sap/cds/srv/app-service.js',
-              '../../node_modules/@sap/cds/lib/env/defaults',
-              '../../node_modules/@sap/cds/lib/*.js',
-              '../../node_modules/@cap-js/sqlite',
+              '@sap/cds/lib/srv/protocols/odata-v4',
+              '@sap/cds/lib/srv/factory',
+              '@sap/cds/srv/app-service.js',
+              '@sap/cds/lib/env/defaults',
+              '@sap/cds/lib/*.js',
+              '@cap-js/sqlite',
             ].map(resolveDynReqTarget),
             dynamicRequireRoot,
             ignoreDynamicRequires: true,
