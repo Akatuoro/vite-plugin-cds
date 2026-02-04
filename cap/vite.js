@@ -102,8 +102,7 @@ export function capVite() {
         // always use dev environment
         const nodeEnv = process.env.NODE_ENV;
         process.env.NODE_ENV = 'development';
-        const { env } = cds;
-        delete env.profiles;
+        const { env } = new cds.constructor();
         process.env.NODE_ENV = nodeEnv;
         return 'export default ' + JSON.stringify(env);
       };
