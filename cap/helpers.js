@@ -1,4 +1,5 @@
 import path from "node:path";
+import { createRequire } from 'node:module';
 import { fileURLToPath, pathToFileURL } from 'url';
 
 
@@ -47,7 +48,14 @@ export const insertFileDir = (code, id) => {
 
 export const resolve = (path, parent) => { try {
   parent &&= pathToFileURL(parent)
-  return fileURLToPath(import.meta.resolve(path, parent));
+  const require = createRequire(parent ?? import.meta.url);
+  try {
+    return require.resolve(path);
+  }
+  catch {
+    // try ESM resolution as fallback - no parent support, but covers wildcards
+    return fileURLToPath(import.meta.resolve(path));
+  }
 } catch (e) {
   if (e.code === 'MODULE_NOT_FOUND') return;
   else throw e;
