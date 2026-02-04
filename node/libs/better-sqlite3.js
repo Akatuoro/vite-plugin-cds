@@ -9,7 +9,13 @@ const init = () => {
         return new _Database(...args);
     };
 
+    // OPFS warning is expected, see https://sqlite.org/forum/forumpost/6549a274f04ab0b4
+    self.sqlite3ApiConfig = {
+      warn: message => message?.includes('OPFS sqlite3_vfs') ? console.debug(message) : console.warn(message),
+    }
+
     fn.initialized = sqlite3InitModule({ print: console.debug, printErr: console.error }).then(sqlite3 => {
+        delete self.sqlite3ApiConfig;
         console.debug('sqlite3 initialized');
         _Database = createBetterSqlite3Like(sqlite3, { filename: ':memory:' }).Database;
         return _Database;
