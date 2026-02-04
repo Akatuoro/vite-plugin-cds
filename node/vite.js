@@ -22,6 +22,13 @@ export function nodeVite() {
   ].map( m => [m, resolve(path.join(__dirname, 'polyfills', m))] )
     .flatMap(([k, v]) => [[k, v], ['node:' + k, v]]))
 
+  // Explicit noop modules to avoid vite warnings
+  // Currently not needed, but may be required in future
+  const unsupported = fromEntries([
+    'module', 'cluster', 'url', 'querystring', 'http', '_http_common', 'child_process', 'worker_threads', 'readline', 'assert'
+  ].map( m => [m, resolve(path.join(__dirname, 'shims/noop'))] )
+    .flatMap(([k, v]) => [[k, v], ['node:' + k, v]]));
+
   const libMocks = fromEntries([
     'express',
     'better-sqlite3',
@@ -37,6 +44,7 @@ export function nodeVite() {
         },
         resolve: {
           alias: {
+            ...unsupported,
             ...nodeMocks,
             ...libMocks,
           }
