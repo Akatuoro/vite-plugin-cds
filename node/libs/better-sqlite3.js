@@ -9,7 +9,7 @@ const init = () => {
         return new _Database(...args);
     };
 
-    fn.initialized = sqlite3InitModule({ print: console.log, printErr: console.error }).then(sqlite3 => {
+    fn.initialized = sqlite3InitModule({ print: console.debug, printErr: console.error }).then(sqlite3 => {
         console.debug('sqlite3 initialized');
         _Database = createBetterSqlite3Like(sqlite3, { filename: ':memory:' }).Database;
         return _Database;

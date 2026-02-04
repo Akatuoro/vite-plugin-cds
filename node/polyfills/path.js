@@ -59,7 +59,6 @@ class Path {
   static relative(from, to) {
     const fromPath = Path.resolve(from);
     const toPath = Path.resolve(to);
-    console.log(`relative from ${from} to ${to}`)
 
     if (fromPath === toPath) {
       return '';
