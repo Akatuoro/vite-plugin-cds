@@ -159,8 +159,16 @@ export function createBetterSqlite3Like(sqlite3, {
 
       const fn = isFn ? fnOrOptions : maybeOptions;
       const options = isOptionsObject && typeof maybeOptions === "function" ? fnOrOptions : maybeOptions;
+      const fnOptions = {
+        ...(options ?? {}),
+        arity: options?.varargs ? -1 : (options?.arity ?? fn.length),
+      };
 
-      this._db.createFunction(name, fn, options);
+      // better-sqlite3-specific options which are not part of sqlite3-wasm's oo1 createFunction options.
+      delete fnOptions.varargs;
+      delete fnOptions.safeIntegers;
+
+      this._db.createFunction(name, (...args) => fn(...args.slice(1)), fnOptions);
       return this;
     }
 
