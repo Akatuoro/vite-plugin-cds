@@ -1,6 +1,7 @@
 import path from "node:path";
 import { createRequire } from 'node:module';
 import { fileURLToPath, pathToFileURL } from 'url';
+import cds from '@sap/cds';
 
 
 export const insertFileDir = (code, id) => {
@@ -85,4 +86,16 @@ export const preloadModules = (code, id) => {
 
     code = code.replace('// <placeholder>', preloadModules.map(({s, t}) => `'${s}': () => require('${t}')`).join(',\n'));
     return { code, map: null };
+}
+
+export const cdsEnv = () => {
+    const nodeEnv = process.env.NODE_ENV;
+    process.env.NODE_ENV = 'development';
+    const { env } = new cds.constructor();
+    // remove sources of host file paths
+    delete env._sources
+    delete env._home
+    Object.values(env.plugins).forEach(plugin => delete plugin.impl)
+    process.env.NODE_ENV = nodeEnv;
+    return env
 }

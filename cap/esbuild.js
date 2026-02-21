@@ -1,7 +1,7 @@
 import path from 'path';
 import fs from 'fs/promises';
-import { fileURLToPath, pathToFileURL } from 'url';
-import { insertFileDir, preloadModules, resolve } from './helpers.js';
+import { fileURLToPath } from 'url';
+import { insertFileDir, preloadModules, resolve, cdsEnv } from './helpers.js';
 
 import cds from '@sap/cds';
 
@@ -75,7 +75,7 @@ export function capESBuild() {
       });
 
       build.onLoad({ filter: /^cds-env$/, namespace: 'virtual' }, async args => {
-        const { env } = cds;
+        const env = cdsEnv();
         return { contents: JSON.stringify(env), loader: 'json' };
       });
 

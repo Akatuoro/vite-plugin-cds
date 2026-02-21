@@ -1,10 +1,9 @@
-import cds from '@sap/cds';
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
 
 import { capESBuild } from './esbuild.js';
-import { insertFileDir, preloadModules, resolve } from './helpers.js';
+import { insertFileDir, preloadModules, resolve, cdsEnv } from './helpers.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -103,10 +102,7 @@ export function capVite() {
     load(id) {
       if (id === 'virtual:cds-env') {
         // always use dev environment
-        const nodeEnv = process.env.NODE_ENV;
-        process.env.NODE_ENV = 'development';
-        const { env } = new cds.constructor();
-        process.env.NODE_ENV = nodeEnv;
+        const env = cdsEnv();
         return 'export default ' + JSON.stringify(env);
       };
       if (id.includes('cds-test') && /cds-test(\.js)?$/.test(id)) {
