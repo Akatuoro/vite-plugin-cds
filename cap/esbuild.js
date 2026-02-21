@@ -109,6 +109,10 @@ export function capESBuild() {
 
           code = insertFileDir(code, args.path);
 
+          if (args.path.includes('/@sap/cds/lib/srv/middlewares/trace.js')) {
+            code = code.replaceAll(/_instrument_.*\([^\)]+\);/g, '');            
+          }
+
           // Fix cjs / esm interop
           code = code.replace("Object.assign (exports,require('fs'))", "require('fs').default ?? require('fs')");
           code = code.replace("require('express')", "require('express').default ?? require('express')");

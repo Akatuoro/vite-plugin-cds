@@ -11,7 +11,9 @@ export const serve = async () => {
             key ID: Integer;
             title: String;
         }
-    }`;
+    }
+    annotate CatalogService.Books:title with 
+        @assert: (case when title = 'LOTR' then 'no lotr allowed' end)`;
     const csn = cds.compile(model);
 
     const csvs = {
@@ -24,6 +26,7 @@ export const serve = async () => {
     await sqlite.initialized;
 
     const app = express();
+    cds.model = cds.compile.for.nodejs (csn)
     cds.db = await cds.connect.to('db');
     await cds.deploy(csn, null, csvs).to(cds.db);
     await cds.serve('all').from(csn).in(app);
@@ -36,7 +39,14 @@ export const serve = async () => {
     const { INSERT } = cds.ql;
     const { CatalogService } = cds.services;
     const { Books } = CatalogService.entities;
-    await INSERT.into(Books).entries({ ID: 1, title: 'LOTR' });
+    const insert = INSERT.into(Books).entries({ ID: 1, title: 'LOTR' });
+    try {
+        await CatalogService.run(insert)
+    }
+    catch (e) {
+        console.info('expecting assert error: ', e)
+    }
+    await insert;
 
     console.debug('app started');
     const response = await app.handle({url: '/odata/v4/catalog/Books'})

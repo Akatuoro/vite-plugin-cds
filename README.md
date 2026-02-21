@@ -131,3 +131,6 @@ console.log('response', response);
 > [Example App](./test/cap-plugin)
 
 Due to Node.js dependencies, functionality is limited.
+
+Known limitations:
+- cds.context() is not unique per request / transaction, see [asynchronous context tracking](./cap/README.md#asynchronous-context-tracking)

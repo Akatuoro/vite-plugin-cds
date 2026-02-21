@@ -7,24 +7,42 @@ export const AsyncResource = class {
     }
 }
 
+let i = 0;
+let stored;
+const storageMap = new Map();
 export const AsyncLocalStorage = class {
-    constructor() {
-        this.store = new Map();
-    }
     getStore() {
-        return this.store;
+        // V8 allows tracing of async function calls.
+        // All involved functions must be recognizable as such (-> async).
+        // Promise forwarding without async (`function (cb) {return cb().then() }`) can break it.
+        // https://v8.dev/docs/stack-trace-api
+        const original = Error.stackTraceLimit;
+        Error.stackTraceLimit = Infinity;
+        const err = new Error();
+        const { stack } = err;
+        Error.stackTraceLimit = original;
+
+        for (const [name] of stack?.matchAll(/__asyncStore\d+/g)) {
+            if (storageMap.has(name)) return storageMap.get(name);
+        }
+        return stored;
     }
-    run(store, callback, ...args) {
-        const previousStore = this.store;
-        this.store = store;
+    async run(store, callback, ...args) {
+        const previousStore = stored;
+        stored = store;
+        const name = `__asyncStore${i++}`
+
+        // Place a marker for the stack trace
+        const fn = (new Function(`return async function ${name}(cb, ...args) { return await cb(...args) }`))()
+        storageMap.set(fn.name, store)
         try {
-            return callback(...args);
+            return await fn(callback, ...args)
         }
         finally {
-            this.store = previousStore;
+            stored = previousStore;
         }
     }
     enterWith(store) {
-        this.store = store;
+        stored = store;
     }
 }

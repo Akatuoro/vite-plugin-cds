@@ -43,6 +43,9 @@ export function capVite() {
           'get test() { return super.test = {} }',
         );
       }
+      if (id.includes('/@sap/cds/lib/srv/middlewares/trace.js')) {
+        code = code.replaceAll(/_instrument_.*\([^\)]+\);/g, '');
+      }
       if (id.includes('lib/i18n/index.js')) {
         code = code.replaceAll('super', 'this');
         return { code, map: null };

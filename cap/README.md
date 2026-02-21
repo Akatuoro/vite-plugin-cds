@@ -18,3 +18,16 @@ The CAP Node.js runtime `@sap/cds` is written in JS. There are however a few hur
 - The cds runtime relies on reflection, so any renaming must be disabled (esbuild: keepNames; rollup: minify: false, preserveModules, preserveEntrySignatures)
 - `@sap/cds/lib/test/cds-test.js` has a particular import/export behavior which can not be parsed correctly by esbuild / rollup / rollup-commonjs
 
+## Limitations
+
+### Asynchronous context tracking
+
+Node.js supports context tracking via its [AsyncLocalStorage API](https://nodejs.org/api/async_context.html) for keeping a context across asynchronous callbacks and promises.
+In CAP, each incoming request or each transaction typically has its own context.
+
+Browsers do not have this functionality, so it is not possible (or very hard -> [zone.js](https://www.npmjs.com/package/zone.js)) to polyfill.
+
+As a result, the current implementation assumes that only one request and transaction exists at a time. Code affected: everything that uses `ctx.context` instead of `req.context`.
+
+The V8 engine has async stack traces, so a [best-effort implementation](../node/polyfills/async_hooks.js) is polyfilled. It sets a marker when a context is being set and searches the stack trace for the newest marker when the context is retrieved.
+While it works for some use cases, it can easily be disrupted if a function in between is not async and only implicitely forwards promises.
