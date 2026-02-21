@@ -45,6 +45,9 @@ export function capVite() {
       if (id.includes('/@sap/cds/lib/srv/middlewares/trace.js')) {
         code = code.replaceAll(/_instrument_.*\([^\)]+\);/g, '');
       }
+      if (id.includes('/@sap/cds/lib/utils/cds-utils.js')) {
+        code = code.replaceAll(/import\s*\(\s*pathToFileURL\(([^\)]+)\)\)/g, 'import(/* @vite-ignore */ pathToFileURL($1))')
+      }
       if (id.includes('lib/i18n/index.js')) {
         code = code.replaceAll('super', 'this');
         return { code, map: null };

@@ -112,6 +112,9 @@ export function capESBuild() {
           if (args.path.includes('/@sap/cds/lib/srv/middlewares/trace.js')) {
             code = code.replaceAll(/_instrument_.*\([^\)]+\);/g, '');            
           }
+          if (args.path.includes('/@sap/cds/lib/utils/cds-utils.js')) {
+            code = code.replaceAll(/import\s*\(\s*pathToFileURL\(([^\)]+)\)\)/g, 'import(/* @vite-ignore */ pathToFileURL($1))')
+          }
 
           // Fix cjs / esm interop
           code = code.replace("Object.assign (exports,require('fs'))", "require('fs').default ?? require('fs')");
