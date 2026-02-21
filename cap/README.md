@@ -22,8 +22,8 @@ The CAP Node.js runtime `@sap/cds` is written in JS. There are however a few hur
 
 ### Asynchronous context tracking
 
-Node.js supports context tracking via its [AsyncLocalStorage API](https://nodejs.org/api/async_context.html) for keeping a context across asynchronous callbacks and promises.
-In CAP, each incoming request or each transaction typically has its own context.
+Node.js supports context tracking via its [AsyncLocalStorage API](https://nodejs.org/api/async_context.html) to keep a context across asynchronous callbacks and promises.
+In CAP, each request / transaction typically has its own context.
 
 Browsers do not have this functionality, so it is not possible (or very hard -> [zone.js](https://www.npmjs.com/package/zone.js)) to polyfill.
 
