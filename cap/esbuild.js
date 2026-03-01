@@ -14,7 +14,7 @@ const csqlite = path.dirname(resolve('@cap-js/sqlite'));
 const ccom1 = path.dirname(resolve('@sap/cds-compiler'));
 const ccom2 = path.dirname(resolve('@sap/cds-compiler', ccds));
 const ccoms = [ccom1, ccom2];
-const noop = path.join(__dirname, 'shims/noop.js');
+const noop = path.join(__dirname, '../node/shims/noop.js');
 
 const isPathInside = (p, dir) => {
   if (!dir) return false;

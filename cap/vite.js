@@ -8,7 +8,7 @@ import { insertFileDir, preloadModules, resolve, cdsEnv } from './helpers.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const noop = path.join(__dirname, 'shims/noop.js');
+const noop = path.join(__dirname, '../node/shims/noop.js');
 
 const ccds = path.dirname(resolve('@sap/cds'));
 
@@ -119,7 +119,8 @@ export function capVite() {
       return null;
     },
 
-    config() {
+    config(config) {
+      const _manualChunks = config?.build?.rollupOptions?.output?.manualChunks
       return {
         optimizeDeps: {
           include: [ '@sap/cds', '@sap/cds-compiler', '@cap-js/sqlite' ],
@@ -148,8 +149,17 @@ export function capVite() {
             requireReturnsDefault: "preferred",
             include: [/node_modules/, /cap/, /node/, '*.js']
           },
-          // necessary because cap coding relies on reflection:
-          minify: false,
+          chunkSizeWarningLimit: 1500,
+          rollupOptions: {
+            output: {
+              manualChunks: (id, api) => {
+                const match = (...paths) => paths.some(p => id.includes(p))
+                if (match('@sap/cds-compiler/')) return 'cdsc'
+                if (match('@sap/cds/', '@cap-js/db-service/', '@cap-js/sqlite/', 'generic-pool/', 'virtual:cds-env', 'vite-plugin-cds/cap/', '__vite-optional-peer-dep:tar:@sap/cds:true', 'js-yaml/')) return 'cds'
+                return _manualChunks?.(id, api) ?? null
+              }
+            },
+          },
         },
         resolve: {
           alias: [

@@ -37,7 +37,8 @@ export function nodeVite() {
   return {
     name: 'node',
 
-    config() {
+    config(config) {
+      const _manualChunks = config?.build?.rollupOptions?.output?.manualChunks
       return {
         define: {
           'process.env.NODE_ENV': 'process.env.NODE_ENV', // Prevent vite from writing this
@@ -53,6 +54,13 @@ export function nodeVite() {
           rollupOptions: {
             output: {
               banner: windowBootstrap,
+              manualChunks: (id, api) => {
+                const match = (...paths) => paths.some(p => id.includes(p))
+                if (match('vite-plugin-cds/node/', '@sqlite.org/sqlite-wasm', 'commonjsHelpers.js', 'vite/modulepreload-polyfill.js')) {
+                  return 'node'
+                }
+                return _manualChunks?.(id, api) ?? null
+              }
             }
           }
         },
