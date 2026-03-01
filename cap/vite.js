@@ -30,6 +30,15 @@ const resolveDynReqTarget = (p) => {
   return dynamicRequireRoot + relFromRoot;
 }
 
+const rewriteRolldownReservedClassNames = (code) => {
+  // oxc (used by rolldown in Vite 8) rejects some identifier names in class declarations
+  return code
+    // class declarations: keep the identifier binding, drop the class name.
+    .replace(/^(\s*)class\s+(any|string|boolean|number)\b([^\{]*)\{/gm, '$1const $2 = class$3{')
+    // class expressions: `const X = class any {}` -> anonymous class expression.
+    .replace(/=\s*class\s+(any|string|boolean|number)\b/g, '= class');
+};
+
 export function capVite() {
   return {
     name: 'cap',
@@ -67,6 +76,8 @@ export function capVite() {
 
 
       if (isPathInside(id, ccds)) {
+        code = rewriteRolldownReservedClassNames(code);
+
         code = `require("${resolve(__dirname + '/shims/preload-modules.js')}")\n` +
           `require("${resolve(__dirname + '/shims/load-cds-env.js')}")\n` +
           code;
@@ -121,15 +132,18 @@ export function capVite() {
 
     config(config) {
       const _manualChunks = config?.build?.rollupOptions?.output?.manualChunks
+      const { rolldownVersion } = this.meta ?? {}
       return {
-        optimizeDeps: {
+        optimizeDeps: rolldownVersion? {
+          exclude: [ '@sap/cds', '@sap/cds-compiler', '@cap-js/sqlite' ],
+        } : {
           include: [ '@sap/cds', '@sap/cds-compiler', '@cap-js/sqlite' ],
           esbuildOptions: {
             plugins: [capESBuild()],
             keepNames: true,
           },
         },
-        esbuild: {
+        esbuild: rolldownVersion? undefined : {
           // necessary because cap coding relies on reflection:
           keepNames: true,
         },
