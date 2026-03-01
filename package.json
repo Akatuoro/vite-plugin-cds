@@ -22,7 +22,10 @@
     ],
     "type": "module",
     "scripts": {
-        "test": "node --test ./**/*.test.js"
+        "test": "node --test ./**/*.test.js",
+        "test:features": "playwright test -c test/cap-plugin-features",
+        "test:sample:cap": "playwright test -c test/cap-plugin",
+        "test:sample:cds": "playwright test -c test/cds-plugin"
     },
     "peerDependencies": {
         "@sap/cds": "^9"
@@ -30,6 +33,7 @@
     "devDependencies": {
         "@sap/cds": "^9",
         "@sqlite.org/sqlite-wasm": "^3",
+        "@playwright/test": "^1",
         "vite": "^7"
     },
     "workspaces": [

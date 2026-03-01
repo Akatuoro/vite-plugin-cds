@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>cap-plugin-features</title>
+</head>
+<body>
+    <h1>cap-plugin-features</h1>
+    <ul id="toc"></ul>
+
+    <script type="module">
+        const pages = window.__PAGES__ ?? [];
+        const toc = document.getElementById("toc");
+
+        toc.innerHTML = pages
+            .map((p) => `<li><a href="${p.href}">${p.title}</a></li>`)
+            .join("");
+    </script>
+</body>
+</html>

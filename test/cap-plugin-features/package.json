@@ -1,0 +1,14 @@
+{
+    "name": "cap-plugin-features",
+    "type": "module",
+    "scripts": {
+        "start": "vite"
+    },
+    "devDependencies": {
+        "@cap-js/sqlite": "^2",
+        "@sap/cds": "^9",
+        "@sqlite.org/sqlite-wasm": "^3",
+        "express": "^4.22.1",
+        "vite": "^7"
+    }
+}

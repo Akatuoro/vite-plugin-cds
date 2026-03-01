@@ -2,12 +2,16 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <title>CDS Runtime Plugin Test</title>
+    <title>CAP in the Browser</title>
 </head>
 <body>
-    <h1>CDS Runtime Plugin Test</h1>
+    <h1>CAP in the Browser</h1>
 
-    <div id="app"></div>
+    <div id="app">
+        <pre id="compiled">cds.compile: loading...</pre>
+        <pre id="odata">OData Response: loading...</pre>
+        <pre id="worker-compiled">cds.compile in worker: loading...</pre>
+    </div>
     <script type="module" src="/main.js"></script>
 </body>
 </html>
