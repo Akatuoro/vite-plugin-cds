@@ -66,6 +66,11 @@ export function capVite() {
         return { code: `module.exports = require ('@cap-js/cds-test')` };
       }
 
+      if (id.includes('SQLiteService.js')) {
+        // init driver early, avoiding dynamic require later on
+        code = code.replace(/let sqlite\s*?[^=]/g, "let sqlite = require('better-sqlite3')");
+        return { code };
+      }
 
       if (isPathInside(id, ccds)) {
         code = `require("${resolve(__dirname + '/shims/preload-modules.js')}")\n` +
