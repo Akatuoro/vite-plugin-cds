@@ -3,6 +3,7 @@
   var proc = g.process || {};
   proc.env = Object.assign({}, proc.env || {}, g.__ENV__ || {});
   proc.cwd = () => '/home';
+  proc.version ??= 'v24.0.0'
   g.process = proc;
   proc.stdout ??= {}
   proc.stderr ??= {}
@@ -31,7 +32,7 @@
       const e = new Error(`Path ${path} not found`);
       e.code = 'MODULE_NOT_FOUND';
       throw e;
-    } 
+    }
     return resolved;
   }
 
