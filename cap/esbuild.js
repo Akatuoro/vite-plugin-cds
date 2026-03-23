@@ -113,7 +113,8 @@ export function capESBuild() {
             code = code.replaceAll(/_instrument_.*\([^\)]+\);/g, '');            
           }
           if (args.path.includes('/@sap/cds/lib/utils/cds-utils.js')) {
-            code = code.replaceAll(/import\s*\((\s*pathToFileURL.*)/g, 'import(/* @vite-ignore */ $1)')
+            code = code.replaceAll(/\bimport\s*?\((.*?pathToFileURL.*?)\)/g, 'import(/* @vite-ignore */ $1)')
+            code = code.replaceAll(/\bimport\s*?\(id\)/g,                    'import(/* @vite-ignore */ id)')
           }
 
           // Fix cjs / esm interop
