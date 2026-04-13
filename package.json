@@ -29,7 +29,7 @@
         "test:all": "for d in test/*; do [ -d \"$d\" ] && playwright test --pass-with-no-tests -c \"$d\"; done"
     },
     "peerDependencies": {
-        "@sap/cds": "^9.8"
+        "@sap/cds": "^9"
     },
     "devDependencies": {
         "@sqlite.org/sqlite-wasm": "^3",
