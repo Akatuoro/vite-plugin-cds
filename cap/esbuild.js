@@ -113,7 +113,8 @@ export function capESBuild() {
             code = code.replaceAll(/_instrument_.*\([^\)]+\);/g, '');            
           }
           if (args.path.includes('/@sap/cds/lib/utils/cds-utils.js')) {
-            code = code.replaceAll(/import\s*\((\s*pathToFileURL.*)/g, 'import(/* @vite-ignore */ $1)')
+            code = code.replaceAll(/\bimport\s*?\((.*?pathToFileURL.*?)\)/g, 'import(/* @vite-ignore */ $1)')
+            code = code.replaceAll(/\bimport\s*?\(id\)/g,                    'import(/* @vite-ignore */ id)')
           }
 
           // Fix cjs / esm interop
@@ -137,6 +138,10 @@ export function capESBuild() {
           // Fix cjs / esm interop
           code = code.replace("require('better-sqlite3')", "require('better-sqlite3').default ?? require('better-sqlite3')");
 
+          if (args.path.includes('SQLiteService.js')) {
+            // init driver early, avoiding dynamic require later on
+            code = code.replace(/let sqlite\s*?[^=]/g, "let sqlite = require('better-sqlite3').default ?? require('better-sqlite3')");
+          }
           return { contents: code, loader: 'js' };
         }
       });

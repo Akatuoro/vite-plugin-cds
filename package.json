@@ -1,6 +1,6 @@
 {
     "name": "vite-plugin-cds",
-    "version": "0.1.9",
+    "version": "0.2.0",
     "description": "Vite plugin for @sap/cds",
     "repository": {
         "type": "git",
@@ -22,14 +22,18 @@
     ],
     "type": "module",
     "scripts": {
-        "test": "node --test ./**/*.test.js"
+        "test": "node --test ./**/*.test.js",
+        "test:features": "playwright test -c test/cap-plugin-features",
+        "test:sample:cap": "playwright test -c test/cap-plugin",
+        "test:sample:cds": "playwright test -c test/cds-plugin",
+        "test:all": "for d in test/*; do [ -d \"$d\" ] && playwright test --pass-with-no-tests -c \"$d\"; done"
     },
     "peerDependencies": {
         "@sap/cds": "^9"
     },
     "devDependencies": {
-        "@sap/cds": "^9",
         "@sqlite.org/sqlite-wasm": "^3",
+        "@playwright/test": "^1",
         "vite": "^7"
     },
     "workspaces": [
