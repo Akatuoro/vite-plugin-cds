@@ -34,7 +34,7 @@ const rewriteRolldownReservedClassNames = (code) => {
   // oxc (used by rolldown in Vite 8) rejects some identifier names in class declarations
   return code
     // class declarations: keep the identifier binding, drop the class name.
-    .replace(/^(\s*)class\s+(any|string|boolean|number)\b([^\{]*)\{/gm, '$1const $2 = class$3{')
+    .replace(/^(\s*)class\s+(any|string|boolean|number)\b([^\{]*)\{/gm, '$1const $2 = class$3{ static get name() { return "$2" };')
     // class expressions: `const X = class any {}` -> anonymous class expression.
     .replace(/=\s*class\s+(any|string|boolean|number)\b/g, '= class');
 };
@@ -77,7 +77,7 @@ export function capVite() {
 
       if (id.includes('SQLiteService.js')) {
         // init driver early, avoiding dynamic require later on
-        code = code.replace(/let sqlite\s*?[^=]/g, "let sqlite = require('better-sqlite3')");
+        code = code.replace(/let sqlite\s*?[^=]*$/g, "let sqlite = require('better-sqlite3')");
         return { code };
       }
 

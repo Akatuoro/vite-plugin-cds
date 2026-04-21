@@ -1,10 +1,20 @@
 import { defineConfig } from 'vite'
-import { cap, node } from '../../';
+import { cap, node } from 'vite-plugin-cds';
 
+const plugins = [ node(), cap() ]
 const config = defineConfig({
-  plugins: [ node(), cap() ],
-  worker: {
-    plugins: () => config.plugins
+  plugins,
+  optimizeDeps: {
+    include: ['cjs-package', '@sap/cds', '@sap/cds-compiler'],
+    rolldownOptions: {
+      plugins,
+    }
+  },
+  build: {
+    minify: false,
+    rolldownOptions: {
+      plugins,
+    }
   },
   root: './',
 })

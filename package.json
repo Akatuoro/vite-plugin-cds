@@ -34,9 +34,10 @@
     "devDependencies": {
         "@sqlite.org/sqlite-wasm": "^3",
         "@playwright/test": "^1",
-        "vite": "^7"
+        "vite": "^8"
     },
     "workspaces": [
+        ".",
         "test/*"
     ],
     "license": "MIT",
