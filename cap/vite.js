@@ -36,8 +36,15 @@ const rewriteRolldownReservedClassNames = (code) => {
     // class declarations: keep the identifier binding, drop the class name.
     .replace(/^(\s*)class\s+(any|string|boolean|number)\b([^\{]*)\{/gm, '$1const $2 = class$3{ static get name() { return "$2" };')
     // class expressions: `const X = class any {}` -> anonymous class expression.
-    .replace(/=\s*class\s+(any|string|boolean|number)\b/g, '= class');
+    .replace(/=(\s*)class\s+(any|string|boolean|number)\b([^\{]*)\{/g, '=$1class$3{ static get name() { return "$2" };');
 };
+
+const toCommonJS = `
+export var __toCommonJS = (mod) =>
+  __hasOwnProp.call(mod, \'module.exports\')
+    ? mod[\'module.exports\']
+    : __copyProps(__defProp(mod.default ?? {}, \'__esModule\', { value: true }), mod);
+`;
 
 export function capVite() {
   return {
@@ -45,10 +52,13 @@ export function capVite() {
     enforce: 'pre',
 
     async transform(code, id) {
-      if (id.includes('vite:cjs-external-facade')) {
-        code = code.replace('...m', '...m, ...(m.default ?? {})')
+      // === modify vite / rolldown code for commonJS compat ===
+      if (id.includes('rolldown/runtime.js')) {
+        code = code.replace('export var __toCommonJS', toCommonJS + 'var __toCommonJSOld')
         return { code }
       }
+      // ======
+
       if (id.includes('/@sap/cds/lib/index.js')) {
         code = code.replace(
           /get test\(\) \{ return super\.test = require\('.*?cds-test\.js'\) \}/,
@@ -80,8 +90,8 @@ export function capVite() {
       }
 
       if (id.includes('SQLiteService.js')) {
-        // init driver early, avoiding dynamic require later on
-        code = code.replace(/let sqlite\s*?[^=]*$/g, "let sqlite = require('better-sqlite3')");
+        // import via strings, not variables
+        code = code.replace(`require(drivers['better-sqlite3'])`, "require('better-sqlite3')");
         return { code };
       }
 
