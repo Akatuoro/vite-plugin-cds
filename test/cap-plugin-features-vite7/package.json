@@ -1,16 +1,14 @@
 {
-    "name": "cap-plugin-test-vite8",
+    "name": "cap-plugin-features-vite7",
     "type": "module",
     "scripts": {
         "start": "vite"
     },
     "devDependencies": {
-        "vite-plugin-cds": "^0",
-        "cjs-package": "*",
         "@cap-js/sqlite": "^2",
         "@sap/cds": "^9",
         "@sqlite.org/sqlite-wasm": "^3",
         "express": "^4.22.1",
-        "vite": "^8"
+        "vite": "^7"
     }
 }

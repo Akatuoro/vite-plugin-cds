@@ -26,6 +26,7 @@
         "test:features": "playwright test -c test/cap-plugin-features",
         "test:sample:cap": "playwright test -c test/cap-plugin",
         "test:sample:cds": "playwright test -c test/cds-plugin",
+        "test:vite7": "playwright test -c test/cap-plugin-features-vite7",
         "test:all": "for d in test/*; do [ -d \"$d\" ] && playwright test --pass-with-no-tests -c \"$d\"; done"
     },
     "peerDependencies": {
