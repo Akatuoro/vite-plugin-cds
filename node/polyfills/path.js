@@ -100,3 +100,5 @@ class Path {
 }
 
 export default Path;
+
+export { Path as 'module.exports' };

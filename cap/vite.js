@@ -30,12 +30,35 @@ const resolveDynReqTarget = (p) => {
   return dynamicRequireRoot + relFromRoot;
 }
 
+const rewriteRolldownReservedClassNames = (code) => {
+  // oxc (used by rolldown in Vite 8) rejects some identifier names in class declarations
+  return code
+    // class declarations: keep the identifier binding, drop the class name.
+    .replace(/^(\s*)class\s+(any|string|boolean|number)\b([^\{]*)\{/gm, '$1const $2 = class$3{ static get name() { return "$2" };')
+    // class expressions: `const X = class any {}` -> anonymous class expression.
+    .replace(/=(\s*)class\s+(any|string|boolean|number)\b([^\{]*)\{/g, '=$1class$3{ static get name() { return "$2" };');
+};
+
+const toCommonJS = `
+export var __toCommonJS = (mod) =>
+  __hasOwnProp.call(mod, \'module.exports\')
+    ? mod[\'module.exports\']
+    : __copyProps(__defProp(mod.default ?? {}, \'__esModule\', { value: true }), mod);
+`;
+
 export function capVite() {
   return {
     name: 'cap',
     enforce: 'pre',
 
     async transform(code, id) {
+      // === modify vite / rolldown code for commonJS compat ===
+      if (id.includes('rolldown/runtime.js')) {
+        code = code.replace('export var __toCommonJS', toCommonJS + 'var __toCommonJSOld')
+        return { code }
+      }
+      // ======
+
       if (id.includes('/@sap/cds/lib/index.js')) {
         code = code.replace(
           /get test\(\) \{ return super\.test = require\('.*?cds-test\.js'\) \}/,
@@ -67,12 +90,14 @@ export function capVite() {
       }
 
       if (id.includes('SQLiteService.js')) {
-        // init driver early, avoiding dynamic require later on
-        code = code.replace(/let sqlite\s*?[^=]/g, "let sqlite = require('better-sqlite3')");
+        // import via strings, not variables
+        code = code.replace(`require(drivers['better-sqlite3'])`, "require('better-sqlite3')");
         return { code };
       }
 
       if (isPathInside(id, ccds)) {
+        code = rewriteRolldownReservedClassNames(code);
+
         code = `require("${resolve(__dirname + '/shims/preload-modules.js')}")\n` +
           `require("${resolve(__dirname + '/shims/load-cds-env.js')}")\n` +
           code;
@@ -127,20 +152,35 @@ export function capVite() {
 
     config(config) {
       const _manualChunks = config?.build?.rollupOptions?.output?.manualChunks
+      const { rolldownVersion } = this.meta ?? {}
+      const match = (...paths) => id => paths.some(p => id.includes(p))
       return {
-        optimizeDeps: {
+        optimizeDeps: rolldownVersion? {
+          include: ['cjs-package', '@sap/cds', '@sap/cds-compiler'],
+          rolldownOptions: { plugins: [capVite()] }
+        } : {
           include: [ '@sap/cds', '@sap/cds-compiler', '@cap-js/sqlite' ],
           esbuildOptions: {
             plugins: [capESBuild()],
             keepNames: true,
           },
         },
-        esbuild: {
+        esbuild: rolldownVersion? undefined : {
           // necessary because cap coding relies on reflection:
           keepNames: true,
         },
-        build: {
-
+        build: rolldownVersion? {
+          chunkSizeWarningLimit: 1500,
+          rolldownOptions: {
+            output: {
+              keepNames: true,
+              codeSplitting: { groups: [
+                { name: 'cdsc', priority: 5, test: '@sap/cds-compiler/', },
+                { name: 'cds', priority: 4, test: match('@sap/cds/', '@cap-js/db-service/', '@cap-js/sqlite/', 'generic-pool/', 'virtual:cds-env', 'vite-plugin-cds/cap/', '__vite-optional-peer-dep:tar:@sap/cds:true', 'js-yaml/'), },
+              ]},
+            },
+          },
+        } : {
           commonjsOptions: {
             dynamicRequireTargets: [
               '@sap/cds/lib/srv/protocols/odata-v4',
