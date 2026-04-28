@@ -6,16 +6,17 @@ import { injectPagesList } from './lib/plugins';
 
 const pages = readdirSync(join(__dirname, 'pages')).filter(name => name.endsWith('.html'))
 
-const plugins = [ node(), cap(), cds(), injectPagesList(pages) ]
 const config = defineConfig({
-  plugins,
-  optimizeDeps: { rolldownOptions: { plugins } },
+  plugins: [ node(), cap(), cds(), injectPagesList(pages) ],
   worker: {
     plugins: () => config.plugins
   },
   build: {
+    rolldownOptions: {
+      input: pages.map(name => resolve(__dirname, 'pages', name)),
+    },
     rollupOptions: {
-      input: pages.map(name => resolve(__dirname, 'pages', name))
+      input: pages.map(name => resolve(__dirname, 'pages', name)),
     }
   },
   root: './pages',

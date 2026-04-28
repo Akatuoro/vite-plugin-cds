@@ -153,9 +153,11 @@ export function capVite() {
     config(config) {
       const _manualChunks = config?.build?.rollupOptions?.output?.manualChunks
       const { rolldownVersion } = this.meta ?? {}
+      const match = (...paths) => id => paths.some(p => id.includes(p))
       return {
         optimizeDeps: rolldownVersion? {
           include: ['cjs-package', '@sap/cds', '@sap/cds-compiler'],
+          rolldownOptions: { plugins: [capVite()] }
         } : {
           include: [ '@sap/cds', '@sap/cds-compiler', '@cap-js/sqlite' ],
           esbuildOptions: {
@@ -167,8 +169,18 @@ export function capVite() {
           // necessary because cap coding relies on reflection:
           keepNames: true,
         },
-        build: {
-
+        build: rolldownVersion? {
+          chunkSizeWarningLimit: 1500,
+          rolldownOptions: {
+            output: {
+              keepNames: true,
+              codeSplitting: { groups: [
+                { name: 'cdsc', priority: 5, test: '@sap/cds-compiler/', },
+                { name: 'cds', priority: 4, test: match('@sap/cds/', '@cap-js/db-service/', '@cap-js/sqlite/', 'generic-pool/', 'virtual:cds-env', 'vite-plugin-cds/cap/', '__vite-optional-peer-dep:tar:@sap/cds:true', 'js-yaml/'), },
+              ]},
+            },
+          },
+        } : {
           commonjsOptions: {
             dynamicRequireTargets: [
               '@sap/cds/lib/srv/protocols/odata-v4',
