@@ -39,6 +39,8 @@ export function nodeVite() {
 
     config(config) {
       const _manualChunks = config?.build?.rollupOptions?.output?.manualChunks
+      const { rolldownVersion } = this.meta ?? {}
+      const match = (...paths) => id => paths.some(p => id.includes(p))
       return {
         define: {
           'process.env.NODE_ENV': 'process.env.NODE_ENV', // Prevent vite from writing this
@@ -50,7 +52,16 @@ export function nodeVite() {
             ...libMocks,
           }
         },
-        build: {
+        build: rolldownVersion? {
+          rolldownOptions: {
+            output: {
+              banner: windowBootstrap,
+              codeSplitting: { groups: [
+                { test: match('vite-plugin-cds/node/', '@sqlite.org/sqlite-wasm', 'commonjsHelpers.js', 'vite/modulepreload-polyfill.js'), name: 'node', priority: 10, },
+              ]},
+            },
+          },
+        } : {
           rollupOptions: {
             output: {
               banner: windowBootstrap,
@@ -64,7 +75,13 @@ export function nodeVite() {
             }
           }
         },
-        worker: {
+        worker: rolldownVersion? {
+          rolldownOptions: {
+            output: {
+              banner: windowBootstrap,
+            },
+          },
+        } : {
           rollupOptions: {
             output: {
               banner: windowBootstrap,

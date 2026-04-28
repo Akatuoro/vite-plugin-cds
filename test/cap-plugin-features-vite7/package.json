@@ -1,5 +1,5 @@
 {
-    "name": "cap-plugin-test",
+    "name": "cap-plugin-features-vite7",
     "type": "module",
     "scripts": {
         "start": "vite"
@@ -9,6 +9,6 @@
         "@sap/cds": "^9",
         "@sqlite.org/sqlite-wasm": "^3",
         "express": "^4.22.1",
-        "vite": "^8"
+        "vite": "^7"
     }
 }
