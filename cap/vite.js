@@ -145,7 +145,7 @@ export function capVite() {
       const { rolldownVersion } = this.meta ?? {}
       return {
         optimizeDeps: rolldownVersion? {
-          exclude: [ '@sap/cds', '@sap/cds-compiler', '@cap-js/sqlite' ],
+          include: ['cjs-package', '@sap/cds', '@sap/cds-compiler'],
         } : {
           include: [ '@sap/cds', '@sap/cds-compiler', '@cap-js/sqlite' ],
           esbuildOptions: {

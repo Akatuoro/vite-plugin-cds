@@ -8,7 +8,7 @@
   },
   "devDependencies": {
     "@cap-js/sqlite": "^2",
-    "vite": "^7"
+    "vite": "^8"
   },
   "scripts": {
     "start": "cds watch"

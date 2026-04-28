@@ -5,7 +5,6 @@ const plugins = [ node(), cap() ]
 const config = defineConfig({
   plugins,
   optimizeDeps: {
-    include: ['cjs-package', '@sap/cds', '@sap/cds-compiler'],
     rolldownOptions: {
       plugins,
     }
