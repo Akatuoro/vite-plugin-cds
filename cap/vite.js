@@ -45,6 +45,10 @@ export function capVite() {
     enforce: 'pre',
 
     async transform(code, id) {
+      if (id.includes('vite:cjs-external-facade')) {
+        code = code.replace('...m', '...m, ...(m.default ?? {})')
+        return { code }
+      }
       if (id.includes('/@sap/cds/lib/index.js')) {
         code = code.replace(
           /get test\(\) \{ return super\.test = require\('.*?cds-test\.js'\) \}/,
