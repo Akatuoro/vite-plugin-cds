@@ -1,0 +1,15 @@
+{
+    "name": "cap-plugin-lightning-fs",
+    "type": "module",
+    "scripts": {
+        "start": "vite"
+    },
+    "devDependencies": {
+        "@cap-js/sqlite": "^2",
+        "@isomorphic-git/lightning-fs": "^4",
+        "@sap/cds": "^9",
+        "@sqlite.org/sqlite-wasm": "^3",
+        "express": "^4.22.1",
+        "vite": "^8"
+    }
+}

@@ -33,7 +33,7 @@
         "@sap/cds": "^9"
     },
     "devDependencies": {
-        "@isomorphic-git/lightning-fs": "^4.6.2",
+        "@isomorphic-git/lightning-fs": "^4",
         "@playwright/test": "^1",
         "@sqlite.org/sqlite-wasm": "^3",
         "vite": "^8"
