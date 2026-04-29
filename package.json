@@ -33,8 +33,9 @@
         "@sap/cds": "^9"
     },
     "devDependencies": {
-        "@sqlite.org/sqlite-wasm": "^3",
+        "@isomorphic-git/lightning-fs": "^4.6.2",
         "@playwright/test": "^1",
+        "@sqlite.org/sqlite-wasm": "^3",
         "vite": "^8"
     },
     "workspaces": [
