@@ -39,7 +39,7 @@ export function nodeVite() {
 
     config(config) {
       const _manualChunks = config?.build?.rollupOptions?.output?.manualChunks
-      const { rolldownVersion } = this.meta ?? {}
+      const { rolldownVersion } = this?.meta ?? {}
       const match = (...paths) => id => paths.some(p => id.includes(p))
       return {
         define: {
