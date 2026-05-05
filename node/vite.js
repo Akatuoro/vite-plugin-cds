@@ -26,7 +26,7 @@ export function nodeVite() {
   // Currently not needed, but may be required in future
   const unsupported = fromEntries([
     'module', 'cluster', 'url', 'querystring', 'http', '_http_common', 'child_process', 'worker_threads', 'readline', 'assert'
-  ].map( m => [m, resolve(path.join(__dirname, 'shims/noop'))] )
+  ].map( m => [m, resolve(path.join(__dirname, 'shims/noop.js'))] )
     .flatMap(([k, v]) => [[k, v], ['node:' + k, v]]));
 
   const libMocks = fromEntries([
@@ -36,6 +36,12 @@ export function nodeVite() {
 
   return {
     name: 'node',
+    enforce: 'pre',
+
+    resolveId(id, importer, options) {
+      if (options?.ssr) return null
+      return unsupported[id] ?? null
+    },
 
     config(config) {
       const _manualChunks = config?.build?.rollupOptions?.output?.manualChunks
@@ -47,7 +53,6 @@ export function nodeVite() {
         },
         resolve: {
           alias: {
-            ...unsupported,
             ...nodeMocks,
             ...libMocks,
           }
@@ -96,7 +101,10 @@ export function nodeVite() {
             'Cross-Origin-Embedder-Policy': 'require-corp',
           },
         },
-        optimizeDeps: {
+        optimizeDeps: rolldownVersion ? {
+          rolldownOptions: { plugins: [nodeVite()] },
+          exclude: ['@sqlite.org/sqlite-wasm'],
+        } : {
           exclude: ['@sqlite.org/sqlite-wasm'],
         },
       };
