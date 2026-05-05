@@ -69,8 +69,9 @@ export function capVite() {
         code = code.replaceAll(/_instrument_.*\([^\)]+\);/g, '');
       }
       if (id.includes('/@sap/cds/lib/utils/cds-utils.js')) {
-        code = code.replaceAll(/\bimport\s*?\((.*?pathToFileURL.*?)\)/g, 'import(/* @vite-ignore */ $1)')
-        code = code.replaceAll(/\bimport\s*?\(id\)/g,                    'import(/* @vite-ignore */ id)')
+        // vite complains about not being able to analyze these dynamic import statements
+        // => turn off esm compatibility since we handle that anyways while bundling
+        code = code.replaceAll(/\bimport\s*\(/g, 'require(')
       }
       if (id.includes('lib/i18n/index.js')) {
         code = code.replaceAll('super', 'this');
@@ -156,7 +157,7 @@ export function capVite() {
       const match = (...paths) => id => paths.some(p => id.includes(p))
       return {
         optimizeDeps: rolldownVersion? {
-          include: ['cjs-package', '@sap/cds', '@sap/cds-compiler'],
+          include: ['@sap/cds', '@sap/cds-compiler'],
           rolldownOptions: { plugins: [capVite()] }
         } : {
           include: [ '@sap/cds', '@sap/cds-compiler', '@cap-js/sqlite' ],
