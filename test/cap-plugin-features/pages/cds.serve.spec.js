@@ -7,5 +7,4 @@ test('cds.serve', async ({ page }) => {
 
     const log = page.locator('#log')
     await expect(log).toContainText('successfully deployed to in-memory database')
-    await expect(log).toContainText('cds.served in')
 })

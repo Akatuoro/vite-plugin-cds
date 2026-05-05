@@ -16,6 +16,7 @@ const config = defineConfig({
     plugins: () => config.plugins
   },
   build: {
+    target: ['chrome111', 'edge111', 'firefox114', 'safari16.4'],
     rollupOptions: {
       input: pages.map(name => resolve(__dirname, root, name)),
     }
