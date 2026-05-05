@@ -2,7 +2,7 @@ import { defineConfig } from '@playwright/test'
 
 const url = 'http://localhost:4185'
 export default defineConfig({
-    testDir: './pages',
+    testDir: '../cap-plugin-features/pages',
     use: { baseURL: url, trace: 'on' },
     reporter: [['list'], ['html']],
     webServer: {
