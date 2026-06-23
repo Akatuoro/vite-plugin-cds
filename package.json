@@ -35,7 +35,7 @@
     },
     "devDependencies": {
         "@playwright/test": "^1",
-        "@sqlite.org/sqlite-wasm": "^3",
+        "@sqlite.org/sqlite-wasm": "latest",
         "vite": "^8"
     },
     "workspaces": [
