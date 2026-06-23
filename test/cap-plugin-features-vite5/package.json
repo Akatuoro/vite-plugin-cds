@@ -1,5 +1,5 @@
 {
-    "name": "cap-plugin-features-vite7",
+    "name": "cap-plugin-features-vite5",
     "type": "module",
     "scripts": {
         "start": "vite"
