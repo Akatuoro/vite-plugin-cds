@@ -91,8 +91,8 @@ export function capVite() {
       }
 
       if (id.includes('SQLiteService.js')) {
-        // import via strings, not variables
-        code = code.replace(`require(drivers['better-sqlite3'])`, "require('better-sqlite3')");
+        // init driver early, avoiding dynamic require later on
+        code = code.replace(/let sqlite.*/g, "let sqlite = require('better-sqlite3').default ?? require('better-sqlite3')");
         return { code };
       }
 

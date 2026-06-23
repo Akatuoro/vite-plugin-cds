@@ -5,10 +5,10 @@
         "start": "vite"
     },
     "devDependencies": {
-        "@cap-js/sqlite": "^2",
-        "@sap/cds": "^9",
-        "@sqlite.org/sqlite-wasm": "^3",
-        "express": "^4.22.1",
+        "@cap-js/sqlite": ">=2",
+        "@sap/cds": ">=9",
+        "@sqlite.org/sqlite-wasm": "latest",
+        "express": ">=4",
         "vite": "^8"
     }
 }

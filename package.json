@@ -1,6 +1,6 @@
 {
     "name": "vite-plugin-cds",
-    "version": "0.3.3",
+    "version": "0.3.4",
     "description": "Vite plugin for @sap/cds",
     "repository": {
         "type": "git",
@@ -31,11 +31,11 @@
         "test:all": "for d in test/* test/**/build; do [ -d \"$d\" ] && playwright test --pass-with-no-tests -c \"$d\"; done"
     },
     "peerDependencies": {
-        "@sap/cds": "^9"
+        "@sap/cds": ">=9"
     },
     "devDependencies": {
-        "@sqlite.org/sqlite-wasm": "^3",
         "@playwright/test": "^1",
+        "@sqlite.org/sqlite-wasm": "latest",
         "vite": "^8"
     },
     "workspaces": [

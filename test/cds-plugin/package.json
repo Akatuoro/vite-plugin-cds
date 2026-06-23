@@ -5,7 +5,7 @@
         "start": "vite"
     },
     "devDependencies": {
-        "@sap/cds": "^9",
+        "@sap/cds": ">=9",
         "vite": "^8"
     }
 }

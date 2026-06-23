@@ -5,10 +5,10 @@
         "start": "vite"
     },
     "devDependencies": {
-        "@sap/cds": "^9",
+        "@sap/cds": ">=9",
         "vite": "^8"
     },
     "dependencies": {
-        "express": "^4.22.1"
+        "express": ">=4"
     }
 }

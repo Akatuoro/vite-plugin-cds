@@ -140,7 +140,7 @@ export function capESBuild() {
 
           if (args.path.includes('SQLiteService.js')) {
             // init driver early, avoiding dynamic require later on
-            code = code.replace(/let sqlite\s*?[^=]/g, "let sqlite = require('better-sqlite3').default ?? require('better-sqlite3')");
+            code = code.replace(/let sqlite.*/g, "let sqlite = require('better-sqlite3').default ?? require('better-sqlite3')");
           }
           return { contents: code, loader: 'js' };
         }
