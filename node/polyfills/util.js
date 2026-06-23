@@ -44,6 +44,7 @@ export function inspect(value) {
 }
 
 inspect.custom = Symbol('inspect.custom');
+inspect.defaultOptions = {};
 
 /**
  * Inherits the prototype methods from one constructor into another.

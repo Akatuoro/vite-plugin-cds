@@ -49,7 +49,7 @@ export const insertFileDir = (code, id) => {
 
 export const resolve = (path, parent) => { try {
   parent &&= pathToFileURL(parent)
-  const require = createRequire(parent ?? import.meta.url);
+  const require = createRequire(parent ?? process.cwd() + "/index.js");
   try {
     return require.resolve(path);
   }
