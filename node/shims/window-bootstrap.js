@@ -10,6 +10,16 @@
   proc.stdin ??= {}
   proc.argv ??= ['<unknown>']
 
+  const sT = g.setTimeout
+  g.setTimeout = function setTimeout(...args) {
+    const r = sT.call(this, ...args)
+    return {
+      ref() { return this },
+      unref() { return this },
+      valueOf() { return r },
+    }
+  }
+
   g.global ??= globalThis
   g.__filename = '<unknown>'
   g.__dirname = '<unknown>'
