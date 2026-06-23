@@ -3,6 +3,8 @@ import { readdirSync } from 'node:fs';
 import { defineConfig } from 'vite'
 import { cap, node, cds } from '../../';
 import { injectPagesList } from './lib/plugins';
+import dir from './lib/dir'
+const { __dirname } = dir(import.meta.url)
 
 const pages = readdirSync(join(__dirname, 'pages')).filter(name => name.endsWith('.html'))
 

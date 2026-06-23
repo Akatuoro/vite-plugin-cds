@@ -3,6 +3,8 @@ import { readdirSync } from 'node:fs';
 import { defineConfig, version} from 'vite'
 import { cap, node, cds } from '../../';
 import { injectPagesList } from '../cap-plugin-features/lib/plugins';
+import dir from './lib/dir'
+const { __dirname } = dir(import.meta.url)
 
 if (!version.startsWith('7')) throw new Error(`Expecting to test vite version 7, got version ${version}`)
 
